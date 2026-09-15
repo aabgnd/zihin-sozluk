@@ -1,0 +1,132 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+import Avatar from "@/components/Avatar";
+import { createClient } from "@/lib/supabase/server";
+import { getViewer } from "@/lib/viewer";
+import { setAllowMessages, unblockUser } from "./actions";
+import AvatarForm from "./AvatarForm";
+
+export const metadata: Metadata = { title: "ayarlar" };
+
+type BlockRow = {
+  blocked_id: string;
+  blocked: { username: string; avatar_url: string | null } | null;
+};
+
+export default async function SettingsPage() {
+  const viewer = await getViewer();
+  if (!viewer) redirect("/giris");
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("blocks")
+    .select(
+      "blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)",
+    )
+    .eq("blocker_id", viewer.id)
+    .order("created_at", { ascending: false });
+  const blocks = (data ?? []) as unknown as BlockRow[];
+
+  return (
+    <section>
+      <header className="px-3 pb-3 pt-4">
+        <h1 className="text-xl font-bold">ayarlar</h1>
+      </header>
+
+      <SettingsSection title="avatar">
+        <div className="flex flex-wrap items-start gap-4">
+          <Avatar
+            username={viewer.username}
+            url={viewer.avatar_url}
+            size="lg"
+          />
+          <AvatarForm />
+        </div>
+      </SettingsSection>
+
+      <SettingsSection title="özel mesajlar">
+        <p className="text-sm leading-relaxed text-muted">
+          {viewer.allow_messages
+            ? "özel mesajların açık, yazarlar sana mesaj atabilir."
+            : "özel mesajların kapalı, kimse sana yeni mesaj atamaz. eski mesajlarını okumaya devam edebilirsin."}
+        </p>
+        <form
+          action={setAllowMessages.bind(null, !viewer.allow_messages)}
+          className="mt-3"
+        >
+          <button
+            type="submit"
+            role="switch"
+            aria-checked={viewer.allow_messages}
+            className={`h-10 rounded-sm px-4 text-sm font-semibold ${
+              viewer.allow_messages
+                ? "border border-line text-ink hover:bg-page"
+                : "bg-gold text-on-gold hover:brightness-95"
+            }`}
+          >
+            {viewer.allow_messages
+              ? "özel mesajları kapat"
+              : "özel mesajları aç"}
+          </button>
+        </form>
+      </SettingsSection>
+
+      <SettingsSection title="engellenenler">
+        {blocks.length === 0 ? (
+          <p className="text-sm text-muted">kimseyi engellemedin.</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {blocks.map((block) => (
+              <li
+                key={block.blocked_id}
+                className="flex items-center justify-between gap-3 py-2"
+              >
+                {block.blocked ? (
+                  <Link
+                    href={`/yazar/${encodeURIComponent(block.blocked.username)}`}
+                    className="inline-flex min-w-0 items-center gap-2 font-semibold text-gold-ink hover:underline"
+                  >
+                    <Avatar
+                      username={block.blocked.username}
+                      url={block.blocked.avatar_url}
+                    />
+                    <span className="break-words">
+                      {block.blocked.username}
+                    </span>
+                  </Link>
+                ) : (
+                  <span className="text-muted">silinmiş hesap</span>
+                )}
+                <form action={unblockUser.bind(null, block.blocked_id)}>
+                  <button
+                    type="submit"
+                    className="h-9 shrink-0 rounded-sm border border-line px-3 text-sm font-semibold hover:bg-page"
+                  >
+                    engeli kaldır
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </SettingsSection>
+    </section>
+  );
+}
+
+function SettingsSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="border-t border-line px-3 py-4">
+      <h2 className="mb-2 text-sm font-bold text-gold-ink">{title}</h2>
+      {children}
+    </div>
+  );
+}

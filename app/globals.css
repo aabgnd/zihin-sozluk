@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light dark;
+
+  --page: #f4efea;
+  --surface: #fbf8f4;
+  --ink: #2b2621;
+  --muted: #6b655d;
+  --line: #dcd3c7;
+  --gold: #e6b91e;
+  --gold-ink: #7a5e00;
+  --on-gold: #171513;
+  --bar: #2a2622;
+  --bar-2: #3a352f;
+  --on-bar: #f4efea;
+  --danger: #a3342b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #171513;
+    --surface: #1f1c19;
+    --ink: #e6e1da;
+    --muted: #a09b93;
+    --line: #34302b;
+    --gold: #f2c318;
+    --gold-ink: #f2c318;
+    --on-gold: #171513;
+    --bar: #0f0e0c;
+    --bar-2: #24211d;
+    --on-bar: #e6e1da;
+    --danger: #f08a7e;
+  }
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-on-gold: var(--on-gold);
+  --color-bar: var(--bar);
+  --color-bar-2: var(--bar-2);
+  --color-on-bar: var(--on-bar);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-source-sans), system-ui, sans-serif;
+}
