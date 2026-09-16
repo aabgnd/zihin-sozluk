@@ -72,9 +72,12 @@
     scrollbar-color: var(--line) transparent;
   }
 
-  /* Sığmayan sekme şeridi: tek satırda kalır, kaydırma çubuğu görünmez. */
+  /* Sığmayan sekme şeridi: tek satırda kalır, kaydırma çubuğu görünmez.
+     overscroll-behavior-x, şeritteki yatay kaydırmanın sayfaya zincirlenip
+     tüm sayfayı yana kaydırmasını engeller. */
   .yatay-kaydir {
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }

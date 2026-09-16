@@ -71,7 +71,7 @@ export default async function SiteHeader() {
           <Link
             href="/"
             aria-label="zihin sözlük ana sayfa"
-            className="shrink-0 text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
+            className="shrink-0 whitespace-nowrap text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
           >
             <span className="text-logo">zihin</span>
             <span className="ml-[0.1em] text-ink">sözlük</span>
@@ -83,7 +83,7 @@ export default async function SiteHeader() {
           />
 
           {/* Sıra: arama, tema, mesajlar, bildirimler, avatar. */}
-          <div className="ml-auto flex items-center gap-0.5 md:ml-0">
+          <div className="ml-auto flex shrink-0 items-center gap-0.5 md:ml-0">
             <div className="md:hidden">
               <MobileSearch buttonClassName={iconButton} />
             </div>
