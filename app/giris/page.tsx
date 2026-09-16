@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { firstParam } from "@/lib/text";
 import { getViewer } from "@/lib/viewer";
+import HashNotice from "./HashNotice";
 import LoginForm from "./LoginForm";
 import ResendForm from "./ResendForm";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = { title: "giriş" };
 
 const NOTICES: Record<string, string> = {
   ban: "bu hesap stoa adabına uymadığı için uçuruldu.",
-  onay: "onay bağlantısı geçersiz ya da süresi dolmuş.",
+  onay: "hesabını açamadık.",
 };
 
 export default async function LoginPage({ searchParams }: PageProps<"/giris">) {
@@ -27,6 +28,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/giris">) {
           className="mb-4 rounded-md border border-danger px-3 py-2 text-sm leading-relaxed text-danger"
         >
           {notice}
+          {hata === "onay" && <HashNotice />}
         </p>
       )}
       {hata === "onay" && (
