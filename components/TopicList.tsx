@@ -14,13 +14,14 @@ export default function TopicList({ topics, empty }: { topics: TopicListItem[]; 
             href={`/baslik/${topic.slug}`}
             className="flex min-h-12 items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
           >
-            <span className="min-w-6 shrink-0 text-center text-xs font-semibold text-gold-ink">
-              {topic.entry_count}
-            </span>
             <span className="break-words leading-snug">{topic.title}</span>
-            {(topic.today_count ?? 0) > 0 && (
-              <span className="ml-auto shrink-0 text-xs text-muted">{topic.today_count}</span>
-            )}
+            <span className="ml-auto flex shrink-0 items-baseline gap-2 text-xs">
+              {/* Bugünkü sayı yalnızca toplamdan farkliysa yazılır, aynı sayı iki kez görünmesin. */}
+              {(topic.today_count ?? 0) > 0 && topic.today_count !== topic.entry_count && (
+                <span className="font-semibold text-gold-ink">+{topic.today_count}</span>
+              )}
+              <span className="text-muted">{topic.entry_count}</span>
+            </span>
           </Link>
         </li>
       ))}
