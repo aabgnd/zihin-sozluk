@@ -6,9 +6,9 @@ export async function proxy(request: NextRequest) {
 
   // Supabase, izinli olmayan dönüş adreslerinde onay kodunu Site URL köküne gönderir.
   if (!pathname.startsWith("/auth/")) {
-    if (searchParams.has("code")) {
+    if (searchParams.has("code") || searchParams.has("token_hash")) {
       const url = request.nextUrl.clone();
-      url.pathname = "/auth/callback";
+      url.pathname = "/auth/confirm";
       return NextResponse.redirect(url);
     }
     if (searchParams.has("error_code")) {

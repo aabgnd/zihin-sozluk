@@ -1,8 +1,8 @@
 "use server";
 
 import type { AuthError } from "@supabase/supabase-js";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { onayAdresi } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import type { FormState } from "@/lib/types";
 
@@ -26,12 +26,6 @@ function authError(error: AuthError): FormState {
       (error.code && AUTH_ERRORS[error.code]) ||
       `bir şeyler ters gitti: ${error.message}`,
   };
-}
-
-async function callbackUrl() {
-  const origin =
-    process.env.NEXT_PUBLIC_APP_URL ?? (await headers()).get("origin");
-  return `${origin}/auth/callback`;
 }
 
 export async function signUp(
@@ -72,7 +66,7 @@ export async function signUp(
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { username }, emailRedirectTo: await callbackUrl() },
+    options: { data: { username }, emailRedirectTo: await onayAdresi() },
   });
   if (error) return authError(error);
 
@@ -110,7 +104,7 @@ export async function resendConfirmation(
   const { error } = await supabase.auth.resend({
     type: "signup",
     email,
-    options: { emailRedirectTo: await callbackUrl() },
+    options: { emailRedirectTo: await onayAdresi() },
   });
   if (error) return authError(error);
 
