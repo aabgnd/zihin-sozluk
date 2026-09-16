@@ -12,6 +12,18 @@ export type SummaryRow = {
   top_topic_count: number | null;
 };
 
+// Özet metni veritabanından 150 karakter kırpılmış gelir; kelime ortasında
+// kesilmesin diye son boşluktan kesilir.
+const SNIPPET_LIMIT = 150;
+
+function kelimeSinirindaKes(snippet: string) {
+  if (snippet.length < SNIPPET_LIMIT) return { metin: snippet, kesildi: false };
+
+  const sonBosluk = snippet.lastIndexOf(" ");
+  const kesilmis = sonBosluk > 40 ? snippet.slice(0, sonBosluk) : snippet;
+  return { metin: `${kesilmis.trimEnd()}…`, kesildi: true };
+}
+
 export default function ZihinOzet({
   summary,
   period,
@@ -22,11 +34,22 @@ export default function ZihinOzet({
   basePath: string;
 }) {
   const entryCount = summary?.entry_count ?? 0;
+  const topEntryHref =
+    summary?.top_entry_id && summary.top_entry_slug
+      ? `/baslik/${summary.top_entry_slug}#entry-${summary.top_entry_id}`
+      : null;
+  // Hiç artı oy almamış entry'ler bu bölümde gösterilmez.
+  const showTopEntry = Boolean(topEntryHref && (summary?.top_entry_upvotes ?? 0) > 0);
+  // Tek entry'lik başlık "en çok yazdığı başlık" sayılmaz.
+  const showTopTopic = Boolean(
+    summary?.top_topic_title && summary.top_topic_slug && (summary.top_topic_count ?? 0) >= 2,
+  );
+  const snippet = kelimeSinirindaKes(summary?.top_entry_snippet ?? "");
 
   return (
     <section className="rounded-xl border border-line bg-surface p-4 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-bold">zihin özet</h2>
+        <h2 className="text-sm font-bold">zihin özeti</h2>
         <nav aria-label="özet dönemi" className="flex gap-1">
           {SUMMARY_PERIODS.map((option) => (
             <Link
@@ -34,9 +57,7 @@ export default function ZihinOzet({
               href={`${basePath}?ozet=${option.value}`}
               aria-current={period === option.value ? "page" : undefined}
               className={`flex h-8 items-center rounded-lg px-2.5 text-xs font-semibold ${
-                period === option.value
-                  ? "bg-gold text-on-gold"
-                  : "text-muted hover:text-ink"
+                period === option.value ? "bg-gold text-on-gold" : "text-muted hover:text-ink"
               }`}
             >
               {option.label}
@@ -54,40 +75,40 @@ export default function ZihinOzet({
             <span className="text-muted">entry yazdı.</span>
           </p>
 
-          {summary?.top_entry_id && summary.top_entry_slug && (
+          {showTopEntry && topEntryHref && (
             <div>
               <p className="text-xs font-semibold text-muted">
                 en çok beğenilen entry&apos;si
               </p>
-              <Link
-                href={`/baslik/${summary.top_entry_slug}#entry-${summary.top_entry_id}`}
-                className="mt-1 block rounded-lg border border-line bg-page p-3 hover:border-gold"
-              >
-                <span className="block break-words leading-6">
-                  {summary.top_entry_snippet}
-                </span>
-                <span className="mt-1 block text-xs font-semibold text-gold-ink">
-                  +{summary.top_entry_upvotes}
-                </span>
-              </Link>
+              <div className="mt-1 rounded-lg border border-line bg-page p-3">
+                <p className="break-words leading-6">{snippet.metin}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold text-gold-ink">
+                    +{summary?.top_entry_upvotes}
+                  </span>
+                  {snippet.kesildi && (
+                    <Link
+                      href={topEntryHref}
+                      className="text-xs font-semibold text-gold-ink hover:underline"
+                    >
+                      devamı
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
-          {summary?.top_topic_title && summary.top_topic_slug && (
+          {showTopTopic && summary?.top_topic_slug && (
             <p>
-              <span className="text-xs font-semibold text-muted">
-                en çok yazdığı başlık:{" "}
-              </span>
+              <span className="text-xs font-semibold text-muted">en çok yazdığı başlık: </span>
               <Link
                 href={`/baslik/${summary.top_topic_slug}`}
                 className="font-semibold text-gold-ink hover:underline"
               >
                 {summary.top_topic_title}
               </Link>
-              <span className="text-muted">
-                {" "}
-                ({summary.top_topic_count} entry)
-              </span>
+              <span className="text-muted"> ({summary.top_topic_count} entry)</span>
             </p>
           )}
         </div>

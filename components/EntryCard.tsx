@@ -149,23 +149,15 @@ export default function EntryCard({
             </time>
             {author && (
               <>
-                <span className="inline-flex items-center gap-1.5">
-                  <Link
-                    href={`/yazar/${encodeURIComponent(author.username)}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold-ink hover:underline"
-                  >
-                    <span className="sm:hidden">
-                      <Avatar
-                        username={author.username}
-                        url={author.avatar_url}
-                      />
-                    </span>
-                    {author.username}
-                  </Link>
-                  {author.status === "caylak" && (
-                    <span className="text-[11px] text-muted">çaylak</span>
-                  )}
-                </span>
+                <Link
+                  href={`/yazar/${encodeURIComponent(author.username)}`}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold-ink hover:underline"
+                >
+                  <span className="sm:hidden">
+                    <Avatar username={author.username} url={author.avatar_url} />
+                  </span>
+                  {author.username}
+                </Link>
                 <TitleBadge
                   generation={author.generation}
                   title={author.title}

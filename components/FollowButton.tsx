@@ -6,12 +6,13 @@ import { followUser, unfollowUser } from "@/app/yazar/actions";
 export default function FollowButton({
   targetId,
   isFollowing,
+  size = "md",
 }: {
   targetId: string;
   isFollowing: boolean;
+  size?: "sm" | "md";
 }) {
-  const [optimisticFollowing, setOptimisticFollowing] =
-    useOptimistic(isFollowing);
+  const [optimisticFollowing, setOptimisticFollowing] = useOptimistic(isFollowing);
   const [pending, startTransition] = useTransition();
 
   const toggle = () => {
@@ -23,19 +24,21 @@ export default function FollowButton({
     });
   };
 
+  const sizeClass = size === "sm" ? "h-9 px-3 text-[13px]" : "h-10 px-4 text-sm";
+
   return (
     <button
       type="button"
       onClick={toggle}
       disabled={pending}
       aria-pressed={optimisticFollowing}
-      className={`flex h-10 items-center rounded-lg px-4 text-sm font-bold disabled:opacity-70 ${
+      className={`flex items-center rounded-lg font-bold disabled:opacity-70 ${sizeClass} ${
         optimisticFollowing
           ? "border border-line text-ink hover:bg-page"
           : "bg-gold text-on-gold hover:brightness-95"
       }`}
     >
-      {optimisticFollowing ? "takipten çık" : "takip et"}
+      {optimisticFollowing ? "takip ediliyor" : "takip et"}
     </button>
   );
 }

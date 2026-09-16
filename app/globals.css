@@ -12,6 +12,8 @@
   --gold: #facc15;
   --gold-ink: #854d0e;
   --on-gold: #0f172a;
+  /* Logodaki "zihin" kelimesi: sarı header üzerinde okunan koyu amber. */
+  --logo: #8a5a00;
   --bar: #facc15;
   --bar-2: #f1f5f9;
   --on-bar: #0f172a;
@@ -30,6 +32,8 @@
   --gold: #facc15;
   --gold-ink: #facc15;
   --on-gold: #0f172a;
+  /* Header karanlık modda da sarı kaldığı için logo renkleri aynı kalır. */
+  --logo: #8a5a00;
   --bar: #facc15;
   --bar-2: #334155;
   --on-bar: #0f172a;
@@ -48,6 +52,7 @@
   --color-gold: var(--gold);
   --color-gold-ink: var(--gold-ink);
   --color-on-gold: var(--on-gold);
+  --color-logo: var(--logo);
   --color-bar: var(--bar);
   --color-bar-2: var(--bar-2);
   --color-on-bar: var(--on-bar);

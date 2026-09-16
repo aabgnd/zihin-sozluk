@@ -23,22 +23,15 @@ export default function ThemeToggle({ className }: { className: string }) {
     setIsDark(next);
   };
 
-  const label = isDark ? "açık moda geç" : "karanlık moda geç";
-
   return (
     <button
       type="button"
       onClick={toggle}
       aria-pressed={isDark}
-      aria-label={label}
-      title={label}
+      aria-label={isDark ? "açık moda geç" : "karanlık moda geç"}
       className={className}
     >
-      {isDark ? (
-        <SunIcon className="size-5" />
-      ) : (
-        <MoonIcon className="size-5" />
-      )}
+      {isDark ? <SunIcon className="size-7" /> : <MoonIcon className="size-7" />}
     </button>
   );
 }

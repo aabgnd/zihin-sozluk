@@ -10,7 +10,7 @@ const TR_TO_ASCII: Record<string, string> = {
 export const RULES_TITLE = "stoa adabı ve sözlük kuralları";
 
 export const RULES_TEXT =
-  "Zihin Sözlük üyeleri birbirine karşı nazik, saygılı ve nezaket kurallarına uygun hareket etmekle yükümlüdür. Hakaret, kışkırtma ve nezaketsiz davranışlarda bulunan hesaplar site yetkilileri tarafından koşulsuz olarak uçurulacaktır (banlanacaktır).";
+  "Zihin Sözlük üyeleri birbirine karşı nazik, saygılı ve nezaket kurallarına uygun davranmakla yükümlüdür. Hakaret, kışkırtma ve nezaketsiz davranışlarda bulunan hesaplar uyarı yapılmadan kapatılabilir.";
 
 export function normalizeTitle(input: string) {
   return input.toLocaleLowerCase("tr").replace(/\s+/g, " ").trim();

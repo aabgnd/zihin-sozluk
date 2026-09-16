@@ -13,10 +13,9 @@ export default function InfoModal({ className }: { className: string }) {
         type="button"
         onClick={() => dialog.current?.showModal()}
         aria-label={RULES_TITLE}
-        title={RULES_TITLE}
         className={className}
       >
-        <InfoIcon className="size-5" />
+        <InfoIcon className="size-7" />
       </button>
 
       <dialog
@@ -38,9 +37,7 @@ export default function InfoModal({ className }: { className: string }) {
               <XIcon className="size-5" />
             </button>
           </div>
-          <p className="mt-3 text-[15px] leading-relaxed text-muted">
-            {RULES_TEXT}
-          </p>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted">{RULES_TEXT}</p>
         </div>
       </dialog>
     </>
