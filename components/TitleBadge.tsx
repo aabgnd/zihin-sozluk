@@ -9,7 +9,8 @@ export default function TitleBadge({
   if (!generation || !title) return null;
 
   return (
-    <span className="inline-block rounded-md border border-gold bg-gold/20 px-2 py-px text-[13px] font-bold lowercase text-gold-ink">
+    // Dolgu yok: iki temada da sarı kenarlık + sarı yazı.
+    <span className="inline-block rounded-md border border-gold px-2 py-px text-[13px] font-bold lowercase text-gold-ink">
       {`${generation} – ${title}`.toLocaleLowerCase("tr")}
     </span>
   );

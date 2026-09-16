@@ -3,6 +3,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /*
+   * Tek sarı. Tema, cihaz ve ekran genişliği ne olursa olsun değişmez.
+   * Kaynağı: koyu moddaki "zihin" logosunun sarısı.
+   */
+  --zihin-yellow: #f0c84a;
+
   /* Zemin beyaz; kutu yerine ince çizgi ve boşluk kullanılır. */
   --page: #ffffff;
   --surface: #ffffff;
@@ -10,12 +16,11 @@
   --ink: #222222;
   --muted: #6b7280;
   --line: #ececee;
-  /* Parlak sarı: sadece dolgu (şerit, buton, aktif çizgi). */
-  --gold: #facc15;
-  /* Koyu altın: yazı olarak kullanılan her yer. */
-  --gold-ink: #8a5a00;
+  --gold: var(--zihin-yellow);
+  --gold-ink: var(--zihin-yellow);
+  --logo: var(--zihin-yellow);
+  /* Sarı dolgu her iki temada da açık olduğu için üstündeki yazı hep koyu. */
   --on-gold: #1a1a1a;
-  --logo: #8a5a00;
   --bar: #ffffff;
   --bar-2: #f6f6f7;
   --on-bar: #222222;
@@ -24,6 +29,7 @@
   --on-alert: #ffffff;
 }
 
+/* Temayla yalnızca zemin, yazı ve çizgiler değişir; sarıya dokunulmaz. */
 :root.dark {
   --page: #16181d;
   --surface: #1b1e24;
@@ -31,11 +37,6 @@
   --ink: #e6e7ea;
   --muted: #9aa0aa;
   --line: #2a2e36;
-  --gold: #facc15;
-  /* Koyu zeminde okunan açık altın. */
-  --gold-ink: #f0c84a;
-  --on-gold: #16181d;
-  --logo: #f0c84a;
   --bar: #1b1e24;
   --bar-2: #23262d;
   --on-bar: #e6e7ea;
@@ -69,6 +70,16 @@
   .ince-kaydirma {
     scrollbar-width: thin;
     scrollbar-color: var(--line) transparent;
+  }
+
+  /* Sığmayan sekme şeridi: tek satırda kalır, kaydırma çubuğu görünmez. */
+  .yatay-kaydir {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .yatay-kaydir::-webkit-scrollbar {
+    display: none;
   }
 }
 
