@@ -49,7 +49,7 @@ export default async function MessagesPage() {
   );
 
   return (
-    <section>
+    <section className="space-y-3">
       <LiveRefresh
         channel={`mesaj-kutusu:${viewer.id}`}
         subscriptions={[
@@ -57,26 +57,24 @@ export default async function MessagesPage() {
           { table: "messages", filter: `sender_id=eq.${viewer.id}` },
         ]}
       />
-      <header className="px-3 pb-3 pt-4">
-        <h1 className="text-xl font-bold">mesajlar</h1>
-      </header>
+      <h1 className="text-xl font-bold">mesajlar</h1>
 
       {conversations.size === 0 ? (
-        <p className="border-t border-line px-3 py-6 leading-relaxed text-muted">
+        <p className="rounded-xl border border-line bg-surface p-4 leading-relaxed text-muted shadow-sm">
           {
             'henüz mesajın yok. bir yazarın profilinden ya da entry\'sinin altındaki "mesaj at" ile yazışmaya başlayabilirsin.'
           }
         </p>
       ) : (
-        <ul className="border-t border-line">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
           {[...conversations.entries()].map(([otherId, { last, unread }]) => {
             const person = people.get(otherId);
             if (!person) return null;
             return (
-              <li key={otherId} className="border-b border-line bg-surface">
+              <li key={otherId}>
                 <Link
                   href={`/mesajlar/${encodeURIComponent(person.username)}`}
-                  className="flex items-center gap-3 px-3 py-3 hover:bg-page"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-page"
                 >
                   <Avatar
                     username={person.username}
@@ -86,7 +84,7 @@ export default async function MessagesPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <span
-                        className={`break-words ${unread > 0 ? "font-bold text-gold-ink" : "font-semibold"}`}
+                        className={`break-words ${unread > 0 ? "font-bold" : "font-semibold"}`}
                       >
                         {person.username}
                       </span>
@@ -103,8 +101,8 @@ export default async function MessagesPage() {
                     </p>
                   </div>
                   {unread > 0 && (
-                    <span className="shrink-0 rounded-sm bg-gold px-1.5 py-0.5 text-xs font-bold text-on-gold">
-                      +{unread}
+                    <span className="shrink-0 rounded-full bg-alert px-2 py-0.5 text-xs font-bold text-on-alert">
+                      {unread}
                     </span>
                   )}
                 </Link>

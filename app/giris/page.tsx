@@ -17,12 +17,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/giris">) {
   const notice = NOTICES[firstParam((await searchParams).hata) ?? ""];
 
   return (
-    <section className="mx-auto max-w-sm px-4 py-8">
-      <h1 className="mb-6 text-xl font-bold">giriş</h1>
+    <section className="mx-auto max-w-sm rounded-xl border border-line bg-surface p-5 shadow-sm">
+      <h1 className="mb-5 text-xl font-bold">giriş</h1>
       {notice && (
         <p
           role="alert"
-          className="mb-4 rounded-sm border border-danger px-3 py-2 text-sm text-danger"
+          className="mb-4 rounded-lg border border-danger px-3 py-2 text-sm text-danger"
         >
           {notice}
         </p>

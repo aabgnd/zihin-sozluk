@@ -15,7 +15,7 @@ export default function Field({ label, name, ...inputProps }: Props) {
         id={name}
         name={name}
         {...inputProps}
-        className="block h-11 w-full rounded-sm border border-line bg-surface px-3 text-base focus:border-gold focus:outline-none"
+        className="block h-11 w-full rounded-lg border border-line bg-surface px-3 text-base focus:border-gold focus:outline-none"
       />
     </div>
   );

@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createEntry } from "@/app/baslik/actions";
+import { createEntry, updateEntry } from "@/app/baslik/actions";
+import { modDeleteTopic } from "@/app/yonetim/actions";
+import CaylakBox from "@/components/CaylakBox";
+import ConfirmButton from "@/components/ConfirmButton";
 import EntryCard from "@/components/EntryCard";
-import EntryForm from "@/components/EntryForm";
+import EntryEditor from "@/components/EntryEditor";
 import LiveRefresh from "@/components/LiveRefresh";
 import Pagination from "@/components/Pagination";
 import { ENTRY_SELECT, getViewerEntryState } from "@/lib/entries";
+import { isPermanentMute } from "@/lib/moderation";
 import { createClient } from "@/lib/supabase/server";
-import { firstParam } from "@/lib/text";
-import type { EntryRow, PublicProfile } from "@/lib/types";
+import { firstParam, formatDateTime } from "@/lib/text";
+import type { EntryRow, Viewer } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
 const PAGE_SIZE = 10;
@@ -18,7 +22,9 @@ export default async function TopicPage({
   searchParams,
 }: PageProps<"/baslik/[slug]">) {
   const { slug } = await params;
-  const pageParam = firstParam((await searchParams).sayfa);
+  const query = await searchParams;
+  const pageParam = firstParam(query.sayfa);
+  const editingId = Math.trunc(Number(firstParam(query.duzenle))) || null;
   const supabase = await createClient();
 
   const [{ data: topic }, viewer] = await Promise.all([
@@ -34,7 +40,8 @@ export default async function TopicPage({
   const { count } = await supabase
     .from("entries")
     .select("id", { count: "exact", head: true })
-    .eq("topic_id", topic.id);
+    .eq("topic_id", topic.id)
+    .is("deleted_at", null);
   const total = count ?? 0;
   if (total === 0) redirect(`/ara?q=${encodeURIComponent(topic.title)}`);
 
@@ -49,6 +56,7 @@ export default async function TopicPage({
     .from("entries")
     .select(ENTRY_SELECT)
     .eq("topic_id", topic.id)
+    .is("deleted_at", null)
     .order("created_at", { ascending: true })
     .range(from, from + PAGE_SIZE - 1);
   const entries = (data ?? []) as unknown as EntryRow[];
@@ -59,42 +67,67 @@ export default async function TopicPage({
   const basePath = `/baslik/${topic.slug}`;
 
   return (
-    <section>
+    <section className="space-y-3">
       <LiveRefresh
         channel={`baslik:${topic.id}`}
         subscriptions={[
           { table: "entries", filter: `topic_id=eq.${topic.id}` },
         ]}
       />
-      <header className="px-3 pt-4">
+
+      <header className="rounded-xl border border-line bg-surface p-4 shadow-sm">
         <h1 className="break-words text-xl font-bold leading-snug">
           {topic.title}
         </h1>
-        <div className="flex items-center justify-between gap-3 py-3 text-sm text-muted">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
           <span>{total} entry</span>
-          <Pagination basePath={basePath} page={page} pageCount={pageCount} />
+          <div className="flex items-center gap-2">
+            {viewer?.isStaff && (
+              <ConfirmButton
+                action={modDeleteTopic.bind(null, topic.id)}
+                label="başlığı sil"
+                title="bu başlık silinsin mi?"
+                description="başlık çöp kutusuna taşınır, gündemden ve aramadan kalkar."
+                className="h-9 rounded-lg border border-danger px-3 text-xs font-semibold text-danger hover:bg-page"
+              />
+            )}
+            <Pagination basePath={basePath} page={page} pageCount={pageCount} />
+          </div>
         </div>
       </header>
 
-      <div className="border-t border-line">
-        {entries.map((entry) => (
+      {entries.map((entry) =>
+        viewer && editingId === entry.id && entry.author?.id === viewer.id ? (
+          <EntryEditor
+            key={entry.id}
+            action={updateEntry.bind(null, entry.id, topic.slug)}
+            draftKey={`taslak-duzenle:${viewer.id}:${entry.id}`}
+            initialContent={entry.content}
+            label="entry'yi düzenle"
+            submitLabel="kaydet"
+            cancelHref={basePath}
+          />
+        ) : (
           <EntryCard
             key={entry.id}
             entry={entry}
             viewerId={viewer?.id ?? null}
+            isStaff={viewer?.isStaff ?? false}
             myVote={votes.get(entry.id)}
             favorited={favorites.has(entry.id)}
           />
-        ))}
-      </div>
+        ),
+      )}
 
       {pageCount > 1 && (
-        <div className="flex justify-end px-3 py-3">
+        <div className="flex justify-end">
           <Pagination basePath={basePath} page={page} pageCount={pageCount} />
         </div>
       )}
 
-      <EntryComposer viewer={viewer} topicId={topic.id} slug={topic.slug} />
+      {!editingId && (
+        <EntryComposer viewer={viewer} topicId={topic.id} slug={topic.slug} />
+      )}
     </section>
   );
 }
@@ -104,13 +137,16 @@ function EntryComposer({
   topicId,
   slug,
 }: {
-  viewer: PublicProfile | null;
+  viewer: Viewer | null;
   topicId: number;
   slug: string;
 }) {
+  const card =
+    "rounded-xl border border-line bg-surface p-4 text-muted shadow-sm";
+
   if (!viewer) {
     return (
-      <p className="px-3 py-4 text-muted">
+      <p className={card}>
         entry yazmak için{" "}
         <Link
           href="/giris"
@@ -122,12 +158,33 @@ function EntryComposer({
       </p>
     );
   }
-  if (viewer.is_frozen) {
+  if (viewer.isMuted && viewer.mutedUntil) {
     return (
-      <p className="px-3 py-4 text-muted">
-        hesabın dondurulduğu için şu an entry yazamazsın.
+      <p className={card}>
+        {isPermanentMute(viewer.mutedUntil)
+          ? "moderasyon tarafından süresiz susturuldun."
+          : `moderasyon tarafından ${formatDateTime(viewer.mutedUntil)} tarihine kadar susturuldun.`}
       </p>
     );
   }
-  return <EntryForm action={createEntry.bind(null, topicId, slug)} />;
+  if (viewer.is_frozen) {
+    return (
+      <p className={card}>hesabın dondurulduğu için şu an entry yazamazsın.</p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {!viewer.isWriter && (
+        <CaylakBox
+          entryCount={viewer.reviewEntryCount}
+          threshold={viewer.writerThreshold}
+        />
+      )}
+      <EntryEditor
+        action={createEntry.bind(null, topicId, slug)}
+        draftKey={`taslak:${viewer.id}:${topicId}`}
+      />
+    </div>
+  );
 }

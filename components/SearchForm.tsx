@@ -17,11 +17,12 @@ export default function SearchForm({
         required
         maxLength={100}
         autoComplete="off"
-        className="h-10 min-w-0 flex-1 rounded-sm border border-line bg-surface px-3 text-base text-ink focus:border-gold focus:outline-none"
+        placeholder="başlık ara"
+        className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-base text-ink placeholder:text-muted focus:border-gold focus:outline-none"
       />
       <button
         type="submit"
-        className="h-10 rounded-sm bg-bar px-4 text-[15px] text-on-bar hover:text-gold lg:bg-bar-2"
+        className="h-11 shrink-0 rounded-lg bg-ink px-4 text-[15px] font-semibold text-page hover:opacity-90"
       >
         getir
       </button>

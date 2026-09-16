@@ -12,23 +12,30 @@ const TABS: { key: TabKey; label: string; href: string }[] = [
 ];
 
 const tabClass =
-  "flex h-11 items-center px-3 text-[15px] text-on-gold sm:px-4 lg:px-5";
+  "flex h-12 items-center border-b-2 px-3 text-[15px] transition-colors sm:px-4";
 
 export function TabLinks({ active }: { active: TabKey | null }) {
   return (
-    <nav aria-label="listeler" className="bg-gold">
-      <div className="mx-auto flex max-w-2xl px-1 lg:max-w-6xl lg:gap-2 lg:px-3">
+    <nav aria-label="listeler" className="border-b border-line bg-surface">
+      <div className="mx-auto flex max-w-7xl gap-1 px-3 md:px-5">
         {TABS.map((tab) => (
           <Link
             key={tab.key}
             href={tab.href}
             aria-current={active === tab.key ? "page" : undefined}
-            className={`${tabClass} ${active === tab.key ? "font-bold underline decoration-2 underline-offset-8" : ""}`}
+            className={`${tabClass} ${
+              active === tab.key
+                ? "border-gold font-bold text-ink"
+                : "border-transparent text-muted hover:text-ink"
+            }`}
           >
             {tab.label}
           </Link>
         ))}
-        <a href="/rastgele" className={tabClass}>
+        <a
+          href="/rastgele"
+          className={`${tabClass} border-transparent text-muted hover:text-ink`}
+        >
           rastgele
         </a>
       </div>

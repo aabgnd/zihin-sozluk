@@ -3,7 +3,7 @@ import Link from "next/link";
 type Props = { basePath: string; page: number; pageCount: number };
 
 const box =
-  "grid h-9 min-w-9 place-items-center rounded-sm border border-line px-2";
+  "grid h-9 min-w-9 place-items-center rounded-lg border border-line px-2";
 
 export default function Pagination({ basePath, page, pageCount }: Props) {
   if (pageCount <= 1) return null;
@@ -15,22 +15,19 @@ export default function Pagination({ basePath, page, pageCount }: Props) {
         <Link
           href={href(page - 1)}
           aria-label="önceki sayfa"
-          className={`${box} text-gold-ink hover:bg-surface`}
+          className={`${box} text-gold-ink hover:bg-page`}
         >
           ‹
         </Link>
       )}
-      <span
-        aria-current="page"
-        className={`${box} bg-surface font-semibold text-ink`}
-      >
+      <span aria-current="page" className={`${box} bg-page font-bold text-ink`}>
         {page}
       </span>
       <span className="text-muted">/</span>
       <Link
         href={href(pageCount)}
         aria-label="son sayfa"
-        className={`${box} text-gold-ink hover:bg-surface`}
+        className={`${box} text-gold-ink hover:bg-page`}
       >
         {pageCount}
       </Link>
@@ -38,7 +35,7 @@ export default function Pagination({ basePath, page, pageCount }: Props) {
         <Link
           href={href(page + 1)}
           aria-label="sonraki sayfa"
-          className={`${box} text-gold-ink hover:bg-surface`}
+          className={`${box} text-gold-ink hover:bg-page`}
         >
           ›
         </Link>

@@ -16,7 +16,7 @@ export default function SignupForm() {
     return (
       <p
         role="status"
-        className="rounded-sm border border-gold bg-surface px-4 py-3 leading-relaxed"
+        className="rounded-lg border border-gold bg-gold/10 px-4 py-3 leading-relaxed"
       >
         {state.message}
       </p>
@@ -48,8 +48,8 @@ export default function SignupForm() {
         minLength={8}
         required
       />
-      <div className="rounded-sm border border-gold bg-surface p-3 text-sm">
-        <p className="font-semibold text-gold-ink">{RULES_TITLE}</p>
+      <div className="rounded-lg border border-line bg-page p-3 text-sm">
+        <p className="font-bold">{RULES_TITLE}</p>
         <p className="mt-1 leading-relaxed text-muted">{RULES_TEXT}</p>
         <label
           htmlFor="rules"
@@ -73,7 +73,7 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={pending}
-        className="h-11 w-full rounded-sm bg-gold font-semibold text-on-gold hover:brightness-95 disabled:opacity-60"
+        className="h-11 w-full rounded-lg bg-gold font-bold text-on-gold hover:brightness-95 disabled:opacity-60"
       >
         {pending ? "kaydediliyor…" : "kaydol"}
       </button>

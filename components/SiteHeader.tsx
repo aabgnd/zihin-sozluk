@@ -3,9 +3,17 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
 import AccountNav from "./AccountNav";
+import { SettingsIcon } from "./icons";
+import InfoModal from "./InfoModal";
 import LiveRefresh from "./LiveRefresh";
 import SearchForm from "./SearchForm";
 import TabBar, { TabLinks } from "./TabBar";
+import ThemeToggle from "./ThemeToggle";
+
+const goldIconButton =
+  "relative grid size-11 place-items-center rounded-lg text-on-gold hover:bg-black/10";
+const barIconButton =
+  "relative grid size-11 shrink-0 place-items-center rounded-lg border border-line bg-surface text-muted hover:text-ink";
 
 export default async function SiteHeader() {
   const viewer = await getViewer();
@@ -44,47 +52,69 @@ export default async function SiteHeader() {
         />
       )}
 
-      <div className="bg-bar">
-        <div className="mx-auto flex max-w-2xl items-center gap-2 px-3 py-2 lg:max-w-6xl lg:gap-6 lg:px-4 lg:py-3">
+      <div className="bg-gold text-on-gold">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2 md:px-5 md:py-3">
           <Link
             href="/"
-            className="mr-auto shrink-0 text-lg font-bold tracking-wide text-gold sm:text-xl lg:mr-0 lg:text-2xl"
+            className="mr-auto shrink-0 text-lg font-extrabold tracking-tight sm:text-xl md:mr-0 md:text-2xl"
           >
             ZİHİN SÖZLÜK
           </Link>
 
           <SearchForm
             inputId="q-genis"
-            className="hidden lg:mx-auto lg:flex lg:min-w-0 lg:max-w-md lg:flex-1"
+            className="hidden md:mx-auto md:flex md:min-w-0 md:max-w-md md:flex-1"
           />
 
-          {viewer ? (
-            <AccountNav
-              viewer={viewer}
-              unreadMessages={unreadMessages}
-              unreadNotifications={unreadNotifications}
-            />
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/giris"
-                className="flex h-11 items-center rounded-sm bg-bar-2 px-4 text-[15px] text-on-bar hover:text-gold lg:bg-transparent"
-              >
-                giriş
-              </Link>
-              <Link
-                href="/kayit"
-                className="flex h-11 items-center rounded-sm bg-gold px-4 text-[15px] font-semibold text-on-gold hover:brightness-95"
-              >
-                kaydol
-              </Link>
-            </div>
-          )}
+          <div className="hidden items-center gap-1 md:flex">
+            <InfoModal className={goldIconButton} />
+            <ThemeToggle className={goldIconButton} />
+          </div>
+
+          <div className="flex items-center gap-1">
+            {viewer ? (
+              <AccountNav
+                viewer={viewer}
+                unreadMessages={unreadMessages}
+                unreadNotifications={unreadNotifications}
+                iconButtonClass={goldIconButton}
+              />
+            ) : (
+              <>
+                <Link
+                  href="/giris"
+                  className="flex h-11 items-center rounded-lg px-3 text-[15px] font-semibold hover:bg-black/10"
+                >
+                  giriş
+                </Link>
+                <Link
+                  href="/kayit"
+                  className="flex h-11 items-center rounded-lg bg-ink px-4 text-[15px] font-semibold text-page hover:opacity-90"
+                >
+                  kaydol
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="bg-bar-2 lg:hidden">
-        <SearchForm inputId="q" className="mx-auto flex max-w-2xl px-3 py-2" />
+      <div className="border-b border-line bg-surface md:hidden">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2">
+          <SearchForm inputId="q" className="flex min-w-0 flex-1" />
+          {viewer && (
+            <Link
+              href="/ayarlar"
+              aria-label="ayarlar"
+              title="ayarlar"
+              className={barIconButton}
+            >
+              <SettingsIcon className="size-5" />
+            </Link>
+          )}
+          <InfoModal className={barIconButton} />
+          <ThemeToggle className={barIconButton} />
+        </div>
       </div>
 
       <Suspense fallback={<TabLinks active={null} />}>

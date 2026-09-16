@@ -40,7 +40,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={pending}
-          className="h-11 w-full rounded-sm bg-gold font-semibold text-on-gold hover:brightness-95 disabled:opacity-60"
+          className="h-11 w-full rounded-lg bg-gold font-bold text-on-gold hover:brightness-95 disabled:opacity-60"
         >
           {pending ? "giriş yapılıyor…" : "giriş yap"}
         </button>
@@ -49,7 +49,7 @@ export default function LoginForm() {
       {state.unconfirmedEmail && (
         <form
           action={resendAction}
-          className="mt-4 space-y-2 rounded-sm border border-line bg-surface p-3 text-sm"
+          className="mt-4 space-y-2 rounded-lg border border-line bg-page p-3 text-sm"
         >
           <input type="hidden" name="email" value={state.unconfirmedEmail} />
           {resendState.message ? (
@@ -58,7 +58,7 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={resending}
-              className="h-10 rounded-sm border border-gold px-4 font-semibold text-gold-ink disabled:opacity-60"
+              className="h-10 rounded-lg border border-gold px-4 font-semibold text-gold-ink disabled:opacity-60"
             >
               {resending ? "gönderiliyor…" : "onay e-postasını tekrar gönder"}
             </button>

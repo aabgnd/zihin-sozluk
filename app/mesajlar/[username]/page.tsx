@@ -50,7 +50,7 @@ export default async function ConversationPage({
   const lastUnread = unread.at(-1);
 
   return (
-    <section>
+    <section className="overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
       <LiveRefresh
         channel={`sohbet:${viewer.id}:${other.id}`}
         subscriptions={[
@@ -65,7 +65,7 @@ export default async function ConversationPage({
         />
       )}
 
-      <header className="flex items-center gap-3 border-b border-line px-3 py-2">
+      <header className="flex items-center gap-3 border-b border-line px-4 py-2">
         <Link
           href="/mesajlar"
           className="flex h-11 items-center pr-2 text-sm text-muted hover:text-ink"
@@ -83,7 +83,7 @@ export default async function ConversationPage({
 
       <ol
         aria-label={`${other.username} ile mesajlar`}
-        className="space-y-2 px-3 py-4"
+        className="space-y-2 px-4 py-4"
       >
         {messages.length === 0 && (
           <li className="text-sm text-muted">
@@ -98,8 +98,8 @@ export default async function ConversationPage({
               className={`flex ${mine ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[85%] rounded-sm border px-3 py-2 ${
-                  mine ? "border-gold bg-gold/15" : "border-line bg-surface"
+                className={`max-w-[85%] rounded-xl border px-3 py-2 ${
+                  mine ? "border-gold bg-gold/15" : "border-line bg-page"
                 }`}
               >
                 <p className="whitespace-pre-line break-words text-[15px] leading-6">
@@ -119,7 +119,7 @@ export default async function ConversationPage({
       <ScrollAnchor key={messages.length} />
 
       {blocker ? (
-        <p className="border-t border-line px-3 py-4 text-sm leading-relaxed text-muted">
+        <p className="border-t border-line px-4 py-4 text-sm leading-relaxed text-muted">
           {blocker}
         </p>
       ) : (

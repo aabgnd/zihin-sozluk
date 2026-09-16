@@ -1,14 +1,17 @@
 import EntryCard from "@/components/EntryCard";
+import PageNumbers from "@/components/PageNumbers";
 import TopicList from "@/components/TopicList";
 import { ENTRY_SELECT, getViewerEntryState } from "@/lib/entries";
 import { createClient } from "@/lib/supabase/server";
 import { firstParam, istanbulDay } from "@/lib/text";
-import { getAgendaTopics } from "@/lib/topics";
+import { AGENDA_PAGE_SIZE, getAgendaPage } from "@/lib/topics";
 import type { EntryRow, TopicListItem } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
-  const list = firstParam((await searchParams).liste);
+  const params = await searchParams;
+  const list = firstParam(params.liste);
+  const page = Math.max(1, Math.trunc(Number(firstParam(params.sayfa))) || 1);
   const supabase = await createClient();
 
   if (list === "bugun" || list === "dun") {
@@ -27,11 +30,27 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     );
   }
 
-  const [topics, { data }, viewer] = await Promise.all([
-    getAgendaTopics(),
+  const { topics, total } = await getAgendaPage(page);
+  const pageCount = Math.max(1, Math.ceil(total / AGENDA_PAGE_SIZE));
+
+  // 2. sayfadan itibaren gündem listesi masaüstünde de ana sütunda gösterilir.
+  if (page > 1) {
+    return (
+      <TopicSection
+        heading="gündem"
+        topics={topics}
+        empty="bu sayfada başlık yok."
+      >
+        <PageNumbers basePath="/" page={page} pageCount={pageCount} />
+      </TopicSection>
+    );
+  }
+
+  const [{ data }, viewer] = await Promise.all([
     supabase
       .from("entries")
       .select(ENTRY_SELECT)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(15),
     getViewer(),
@@ -44,36 +63,37 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 
   return (
     <>
-      <div className="lg:hidden">
+      <div className="md:hidden">
         <TopicSection
           heading="gündem"
           topics={topics}
           empty="henüz başlık açılmamış. arama kutusuna bir başlık yazıp ilkini sen aç."
-        />
+        >
+          <PageNumbers basePath="/" page={page} pageCount={pageCount} />
+        </TopicSection>
       </div>
 
-      <section className="hidden lg:block">
-        <h1 className="px-3 pb-3 pt-4 text-xl font-bold">{"son entry'ler"}</h1>
-        <div className="border-t border-line">
-          {entries.length === 0 ? (
-            <p className="px-3 py-6 text-muted">
-              {
-                "henüz entry yok. arama kutusuna bir başlık yazıp ilk entry'yi sen gir."
-              }
-            </p>
-          ) : (
-            entries.map((entry) => (
-              <EntryCard
-                key={entry.id}
-                entry={entry}
-                myVote={votes.get(entry.id)}
-                favorited={favorites.has(entry.id)}
-                viewerId={viewer?.id ?? null}
-                showTopic
-              />
-            ))
-          )}
-        </div>
+      <section className="hidden space-y-3 md:block">
+        <h1 className="text-xl font-bold">{"son entry'ler"}</h1>
+        {entries.length === 0 ? (
+          <p className="rounded-xl border border-line bg-surface p-4 leading-relaxed text-muted shadow-sm">
+            {
+              "henüz entry yok. arama kutusuna bir başlık yazıp ilk entry'yi sen gir."
+            }
+          </p>
+        ) : (
+          entries.map((entry) => (
+            <EntryCard
+              key={entry.id}
+              entry={entry}
+              viewerId={viewer?.id ?? null}
+              isStaff={viewer?.isStaff ?? false}
+              myVote={votes.get(entry.id)}
+              favorited={favorites.has(entry.id)}
+              showTopic
+            />
+          ))
+        )}
       </section>
     </>
   );
@@ -83,15 +103,18 @@ function TopicSection({
   heading,
   topics,
   empty,
+  children,
 }: {
   heading: string;
   topics: TopicListItem[];
   empty: string;
+  children?: React.ReactNode;
 }) {
   return (
-    <section>
-      <h1 className="px-3 py-3 text-lg font-bold">{heading}</h1>
+    <section className="space-y-3">
+      <h1 className="text-xl font-bold">{heading}</h1>
       <TopicList topics={topics} empty={empty} />
+      {children}
     </section>
   );
 }

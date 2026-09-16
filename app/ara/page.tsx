@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createTopicWithEntry } from "@/app/baslik/actions";
-import EntryForm from "@/components/EntryForm";
+import EntryEditor from "@/components/EntryEditor";
 import TopicList from "@/components/TopicList";
+import { isPermanentMute } from "@/lib/moderation";
 import { createClient } from "@/lib/supabase/server";
-import { firstParam, normalizeTitle, slugify } from "@/lib/text";
-import type { PublicProfile, TopicListItem } from "@/lib/types";
+import {
+  firstParam,
+  formatDateTime,
+  normalizeTitle,
+  slugify,
+} from "@/lib/text";
+import type { TopicListItem, Viewer } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
 export const metadata: Metadata = { title: "arama" };
@@ -34,7 +40,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
   const [{ data }, viewer] = await Promise.all([
     supabase
       .from("topic_stats")
-      .select("title, slug, entry_count")
+      .select("title, slug, entry_count, today_count")
       .ilike("title", pattern)
       .gt("entry_count", 0)
       .order("entry_count", { ascending: false })
@@ -44,19 +50,19 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
   const similar = (data ?? []) as TopicListItem[];
 
   return (
-    <section>
-      <header className="px-3 pb-3 pt-4">
+    <section className="space-y-3">
+      <header className="rounded-xl border border-line bg-surface p-4 shadow-sm">
         <h1 className="break-words text-xl font-bold leading-snug">{query}</h1>
         <p className="mt-1 text-sm text-muted">
           {"bu başlık henüz açılmamış, ilk entry'yi sen yaz."}
         </p>
       </header>
-      <div className="border-t border-line">
-        <FirstEntry viewer={viewer} query={query} hasSlug={slug !== ""} />
-      </div>
+
+      <FirstEntry viewer={viewer} query={query} slug={slug} />
+
       {similar.length > 0 && (
         <>
-          <h2 className="border-t border-line px-3 pb-2 pt-4 text-sm font-semibold text-muted">
+          <h2 className="pt-2 text-sm font-bold text-muted">
             benzer başlıklar
           </h2>
           <TopicList topics={similar} empty="" />
@@ -69,15 +75,18 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
 function FirstEntry({
   viewer,
   query,
-  hasSlug,
+  slug,
 }: {
-  viewer: PublicProfile | null;
+  viewer: Viewer | null;
   query: string;
-  hasSlug: boolean;
+  slug: string;
 }) {
+  const card =
+    "rounded-xl border border-line bg-surface p-4 text-muted shadow-sm";
+
   if (!viewer) {
     return (
-      <p className="px-3 py-4 text-muted">
+      <p className={card}>
         {"ilk entry'yi yazmak için "}
         <Link
           href="/giris"
@@ -89,19 +98,34 @@ function FirstEntry({
       </p>
     );
   }
+  if (!viewer.isWriter) {
+    return (
+      <p className={card}>
+        yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.
+      </p>
+    );
+  }
+  if (viewer.isMuted && viewer.mutedUntil) {
+    return (
+      <p className={card}>
+        {isPermanentMute(viewer.mutedUntil)
+          ? "moderasyon tarafından süresiz susturuldun."
+          : `moderasyon tarafından ${formatDateTime(viewer.mutedUntil)} tarihine kadar susturuldun.`}
+      </p>
+    );
+  }
   if (viewer.is_frozen) {
     return (
-      <p className="px-3 py-4 text-muted">
-        hesabın dondurulduğu için şu an entry yazamazsın.
-      </p>
+      <p className={card}>hesabın dondurulduğu için şu an entry yazamazsın.</p>
     );
   }
-  if (!hasSlug) {
-    return (
-      <p className="px-3 py-4 text-muted">
-        başlıkta en az bir harf ya da rakam olmalı.
-      </p>
-    );
+  if (!slug) {
+    return <p className={card}>başlıkta en az bir harf ya da rakam olmalı.</p>;
   }
-  return <EntryForm action={createTopicWithEntry.bind(null, query)} />;
+  return (
+    <EntryEditor
+      action={createTopicWithEntry.bind(null, query)}
+      draftKey={`taslak-yeni:${viewer.id}:${slug}`}
+    />
+  );
 }

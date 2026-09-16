@@ -1,13 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
-import type { PublicProfile } from "@/lib/types";
+import { isPermanentMute } from "@/lib/moderation";
+import { formatDateTime } from "@/lib/text";
+import type { PublicProfile, Viewer } from "@/lib/types";
 
 export const MESSAGE_COLUMNS =
   "id, sender_id, receiver_id, content, is_read, created_at";
 
 export async function getMessageBlocker(
-  viewer: PublicProfile,
+  viewer: Viewer,
   other: PublicProfile,
 ): Promise<string | null> {
+  if (viewer.isMuted && viewer.mutedUntil) {
+    return isPermanentMute(viewer.mutedUntil)
+      ? "moderasyon tarafından süresiz susturuldun."
+      : `moderasyon tarafından ${formatDateTime(viewer.mutedUntil)} tarihine kadar susturuldun.`;
+  }
+  if (!viewer.isWriter) {
+    return "yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.";
+  }
   if (viewer.is_frozen)
     return "hesabın dondurulduğu için şu an mesaj gönderemezsin.";
   if (other.is_banned) return "bu yazar uçurulduğu için mesaj gönderilemez.";

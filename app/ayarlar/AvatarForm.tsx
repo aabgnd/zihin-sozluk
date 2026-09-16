@@ -24,7 +24,7 @@ export default function AvatarForm() {
         type="file"
         accept="image/jpeg,image/png,image/webp"
         required
-        className="block w-full text-sm text-muted file:mr-3 file:h-10 file:cursor-pointer file:rounded-sm file:border-0 file:bg-bar-2 file:px-3 file:text-on-bar"
+        className="block w-full text-sm text-muted file:mr-3 file:h-10 file:cursor-pointer file:rounded-lg file:border-0 file:bg-bar-2 file:px-3 file:font-semibold file:text-ink"
       />
       {state.error && (
         <p role="alert" className="text-sm text-danger">
@@ -39,7 +39,7 @@ export default function AvatarForm() {
       <button
         type="submit"
         disabled={pending}
-        className="h-10 rounded-sm bg-gold px-4 text-sm font-semibold text-on-gold hover:brightness-95 disabled:opacity-60"
+        className="h-11 rounded-lg bg-gold px-4 text-sm font-bold text-on-gold hover:brightness-95 disabled:opacity-60"
       >
         {pending ? "yükleniyor…" : "avatarı değiştir"}
       </button>

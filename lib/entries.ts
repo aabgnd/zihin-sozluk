@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 export const ENTRY_SELECT =
-  "id, content, upvotes, downvotes, created_at, author:profiles!entries_user_id_fkey(id, username, avatar_url, generation, title, allow_messages), topic:topics!entries_topic_id_fkey(title, slug), favorites(count)";
+  "id, content, upvotes, downvotes, created_at, edited_at, author:profiles!entries_user_id_fkey(id, username, avatar_url, generation, title, allow_messages, status), topic:topics!entries_topic_id_fkey(title, slug), favorites(count)";
 
 export async function getViewerEntryState(
   viewerId: string | null,

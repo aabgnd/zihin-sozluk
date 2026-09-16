@@ -20,16 +20,18 @@ type NotificationRow = {
   entry: {
     id: number;
     content: string;
+    deleted_at: string | null;
     topic: { title: string; slug: string } | null;
   } | null;
 };
 
 const NOTIFICATION_SELECT =
-  "id, type, is_read, created_at, actor:profiles!notifications_actor_id_fkey(username, avatar_url), entry:entries!notifications_entry_id_fkey(id, content, topic:topics!entries_topic_id_fkey(title, slug))";
+  "id, type, is_read, created_at, actor:profiles!notifications_actor_id_fkey(username, avatar_url), entry:entries!notifications_entry_id_fkey(id, content, deleted_at, topic:topics!entries_topic_id_fkey(title, slug))";
 
 function describe(notification: NotificationRow) {
-  const topicHref = notification.entry?.topic
-    ? `/baslik/${notification.entry.topic.slug}`
+  const entry = notification.entry;
+  const topicHref = entry?.topic
+    ? `/baslik/${entry.topic.slug}#entry-${entry.id}`
     : null;
   switch (notification.type) {
     case "upvote":
@@ -59,13 +61,18 @@ export default async function NotificationsPage() {
     .eq("user_id", viewer.id)
     .order("created_at", { ascending: false })
     .limit(50);
-  const notifications = (data ?? []) as unknown as NotificationRow[];
+
+  // Silinmiş entry'lerin bildirimleri listelenmez.
+  const notifications = ((data ?? []) as unknown as NotificationRow[]).filter(
+    (notification) =>
+      !notification.entry || notification.entry.deleted_at === null,
+  );
   const newestUnread = notifications.find(
     (notification) => !notification.is_read,
   );
 
   return (
-    <section>
+    <section className="space-y-3">
       <LiveRefresh
         channel={`bildirim-kutusu:${viewer.id}`}
         subscriptions={[
@@ -76,18 +83,16 @@ export default async function NotificationsPage() {
         <MarkRead key={newestUnread.id} action={markNotificationsRead} />
       )}
 
-      <header className="px-3 pb-3 pt-4">
-        <h1 className="text-xl font-bold">bildirimler</h1>
-      </header>
+      <h1 className="text-xl font-bold">bildirimler</h1>
 
       {notifications.length === 0 ? (
-        <p className="border-t border-line px-3 py-6 leading-relaxed text-muted">
+        <p className="rounded-xl border border-line bg-surface p-4 leading-relaxed text-muted shadow-sm">
           {
             "henüz bildirimin yok. entry'lerin artılanınca, favorilenince, başlığına entry girilince ya da sana mesaj gelince burada görünecek."
           }
         </p>
       ) : (
-        <ul className="border-t border-line">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
           {notifications.map((notification) => {
             const { text, href } = describe(notification);
             const body = (
@@ -104,7 +109,7 @@ export default async function NotificationsPage() {
                     </span>{" "}
                     {text}
                     {!notification.is_read && (
-                      <span className="ml-2 rounded-sm bg-gold px-1.5 py-px text-[11px] font-bold text-on-gold">
+                      <span className="ml-2 rounded-full bg-alert px-2 py-px text-[11px] font-bold text-on-alert">
                         yeni
                       </span>
                     )}
@@ -132,17 +137,17 @@ export default async function NotificationsPage() {
             return (
               <li
                 key={notification.id}
-                className={`border-b border-line ${notification.is_read ? "" : "bg-surface"}`}
+                className={notification.is_read ? "" : "bg-page"}
               >
                 {href ? (
                   <Link
                     href={href}
-                    className="flex gap-3 px-3 py-3 hover:bg-surface"
+                    className="flex gap-3 px-4 py-3 hover:bg-page"
                   >
                     {body}
                   </Link>
                 ) : (
-                  <div className="flex gap-3 px-3 py-3">{body}</div>
+                  <div className="flex gap-3 px-4 py-3">{body}</div>
                 )}
               </li>
             );

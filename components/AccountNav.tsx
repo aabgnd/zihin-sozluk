@@ -2,135 +2,137 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { signOut } from "@/app/auth/actions";
 import type { PublicProfile } from "@/lib/types";
-import { BellIcon, MessageIcon, UserIcon } from "./icons";
-import MobileMenu from "./MobileMenu";
+import Avatar from "./Avatar";
+import {
+  BellIcon,
+  LogOutIcon,
+  MessageIcon,
+  SettingsIcon,
+  ShieldIcon,
+  StarIcon,
+  UserIcon,
+} from "./icons";
+import UserMenu from "./UserMenu";
 
 type Props = {
-  viewer: Pick<PublicProfile, "username" | "role">;
+  viewer: Pick<PublicProfile, "username" | "avatar_url" | "role">;
   unreadMessages: number;
   unreadNotifications: number;
+  iconButtonClass: string;
 };
 
-const tileBase =
-  "relative grid size-10 place-items-center rounded-sm bg-bar-2 hover:text-gold sm:size-11";
 const menuItem =
-  "flex h-11 w-full items-center px-4 text-left text-[15px] hover:bg-page";
+  "flex h-11 w-full items-center gap-2.5 px-4 text-left text-[15px] hover:bg-page";
 
 export default function AccountNav({
   viewer,
   unreadMessages,
   unreadNotifications,
+  iconButtonClass,
 }: Props) {
   const profileHref = `/yazar/${encodeURIComponent(viewer.username)}`;
   const isStaff = viewer.role === "admin" || viewer.role === "mod";
   const messagesLabel =
-    unreadMessages > 0 ? `mesajlar (+${unreadMessages})` : "mesajlar";
+    unreadMessages > 0 ? `mesajlar, ${unreadMessages} okunmamış` : "mesajlar";
   const notificationsLabel =
     unreadNotifications > 0
-      ? `bildirimler (${unreadNotifications})`
+      ? `bildirimler, ${unreadNotifications} okunmamış`
       : "bildirimler";
 
   return (
     <>
-      <nav
-        aria-label="hesap"
-        className="hidden shrink-0 items-center gap-3 lg:flex"
+      <Link
+        href="/mesajlar"
+        aria-label={messagesLabel}
+        title="mesajlar"
+        className={iconButtonClass}
       >
-        <DesktopLink href={profileHref}>ben</DesktopLink>
-        <DesktopLink href="/mesajlar" highlight={unreadMessages > 0}>
-          {messagesLabel}
-        </DesktopLink>
-        <DesktopLink href="/bildirimler" highlight={unreadNotifications > 0}>
-          {notificationsLabel}
-        </DesktopLink>
-        <DesktopLink href={`${profileHref}?sekme=favoriler`}>
-          favoriler
-        </DesktopLink>
-        <DesktopLink href="/ayarlar">ayarlar</DesktopLink>
-        {isStaff && (
-          <DesktopLink href="/admin" highlight>
-            yönetim
-          </DesktopLink>
+        <MessageIcon className="size-5" />
+        {unreadMessages > 0 && <CountBadge>{unreadMessages}</CountBadge>}
+      </Link>
+
+      <Link
+        href="/bildirimler"
+        aria-label={notificationsLabel}
+        title="bildirimler"
+        className={iconButtonClass}
+      >
+        <BellIcon className="size-5" />
+        {unreadNotifications > 0 && (
+          <CountBadge>{unreadNotifications}</CountBadge>
         )}
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="whitespace-nowrap text-sm text-on-bar hover:text-gold"
+      </Link>
+
+      <UserMenu
+        label={`${viewer.username} menüsü`}
+        triggerClassName={`${iconButtonClass} overflow-hidden`}
+        trigger={
+          <Avatar
+            username={viewer.username}
+            url={viewer.avatar_url}
+            size="md"
+          />
+        }
+      >
+        <p className="border-b border-line px-4 pb-2 pt-1 text-sm font-bold">
+          {viewer.username}
+        </p>
+        <MenuLink href={profileHref} icon={<UserIcon className="size-4" />}>
+          ben
+        </MenuLink>
+        <MenuLink href="/mesajlar" icon={<MessageIcon className="size-4" />}>
+          mesajlar
+        </MenuLink>
+        <MenuLink href="/bildirimler" icon={<BellIcon className="size-4" />}>
+          bildirimler
+        </MenuLink>
+        <MenuLink
+          href={`${profileHref}?sekme=favoriler`}
+          icon={<StarIcon className="size-4" />}
+        >
+          favoriler
+        </MenuLink>
+        <MenuLink href="/ayarlar" icon={<SettingsIcon className="size-4" />}>
+          ayarlar
+        </MenuLink>
+        {isStaff && (
+          <MenuLink
+            href="/yonetim"
+            icon={<ShieldIcon className="size-4" />}
+            highlight
           >
+            yönetim
+          </MenuLink>
+        )}
+        <form action={signOut} className="border-t border-line">
+          <button type="submit" role="menuitem" className={menuItem}>
+            <LogOutIcon className="size-4" />
             çıkış
           </button>
         </form>
-      </nav>
-
-      <nav aria-label="hesap" className="flex items-center gap-1.5 lg:hidden">
-        <Link
-          href={profileHref}
-          aria-label="ben"
-          title="ben"
-          className={`${tileBase} text-on-bar`}
-        >
-          <UserIcon className="size-5" />
-        </Link>
-        <Link
-          href="/mesajlar"
-          aria-label={messagesLabel}
-          title={messagesLabel}
-          className={`${tileBase} ${unreadMessages > 0 ? "text-gold ring-1 ring-gold" : "text-on-bar"}`}
-        >
-          <MessageIcon className="size-5" />
-          {unreadMessages > 0 && <CountBadge>+{unreadMessages}</CountBadge>}
-        </Link>
-        <Link
-          href="/bildirimler"
-          aria-label={notificationsLabel}
-          title={notificationsLabel}
-          className={`${tileBase} ${unreadNotifications > 0 ? "text-gold ring-1 ring-gold" : "text-on-bar"}`}
-        >
-          <BellIcon className="size-5" />
-          {unreadNotifications > 0 && (
-            <CountBadge>{unreadNotifications}</CountBadge>
-          )}
-        </Link>
-        <MobileMenu triggerClassName={`${tileBase} text-on-bar`}>
-          <Link href={`${profileHref}?sekme=favoriler`} className={menuItem}>
-            favoriler
-          </Link>
-          <Link href="/ayarlar" className={menuItem}>
-            ayarlar
-          </Link>
-          {isStaff && (
-            <Link
-              href="/admin"
-              className={`${menuItem} font-semibold text-gold-ink`}
-            >
-              yönetim
-            </Link>
-          )}
-          <form action={signOut} className="border-t border-line">
-            <button type="submit" className={menuItem}>
-              çıkış
-            </button>
-          </form>
-        </MobileMenu>
-      </nav>
+      </UserMenu>
     </>
   );
 }
 
-function DesktopLink({
+function MenuLink({
   href,
+  icon,
   highlight = false,
   children,
 }: {
   href: string;
+  icon: ReactNode;
   highlight?: boolean;
   children: ReactNode;
 }) {
   return (
     <Link
       href={href}
-      className={`whitespace-nowrap text-sm hover:text-gold ${highlight ? "font-bold text-gold" : "text-on-bar"}`}
+      role="menuitem"
+      className={`${menuItem} ${highlight ? "font-semibold text-gold-ink" : ""}`}
     >
+      {icon}
       {children}
     </Link>
   );
@@ -140,7 +142,7 @@ function CountBadge({ children }: { children: ReactNode }) {
   return (
     <span
       aria-hidden="true"
-      className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-bold leading-none text-on-gold motion-safe:animate-pulse"
+      className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-alert px-1 text-[11px] font-bold leading-none text-on-alert"
     >
       {children}
     </span>

@@ -10,8 +10,8 @@ export default async function SignupPage() {
   if (await getViewer()) redirect("/");
 
   return (
-    <section className="mx-auto max-w-sm px-4 py-8">
-      <h1 className="mb-6 text-xl font-bold">kaydol</h1>
+    <section className="mx-auto max-w-sm rounded-xl border border-line bg-surface p-5 shadow-sm">
+      <h1 className="mb-5 text-xl font-bold">kaydol</h1>
       <SignupForm />
       <p className="mt-6 text-sm text-muted">
         zaten hesabın var mı?{" "}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import Avatar from "@/components/Avatar";
+import ThemeToggle from "@/components/ThemeToggle";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
 import { setAllowMessages, unblockUser } from "./actions";
@@ -30,10 +31,18 @@ export default async function SettingsPage() {
   const blocks = (data ?? []) as unknown as BlockRow[];
 
   return (
-    <section>
-      <header className="px-3 pb-3 pt-4">
-        <h1 className="text-xl font-bold">ayarlar</h1>
-      </header>
+    <section className="space-y-3">
+      <h1 className="text-xl font-bold">ayarlar</h1>
+
+      <SettingsSection title="görünüm">
+        <div className="flex flex-wrap items-center gap-3">
+          <ThemeToggle className="grid size-11 place-items-center rounded-lg border border-line hover:bg-page" />
+          <p className="text-sm text-muted">
+            açık ve karanlık mod arasında geçiş yapar. tercihin bu cihazda
+            saklanır.
+          </p>
+        </div>
+      </SettingsSection>
 
       <SettingsSection title="avatar">
         <div className="flex flex-wrap items-start gap-4">
@@ -60,7 +69,7 @@ export default async function SettingsPage() {
             type="submit"
             role="switch"
             aria-checked={viewer.allow_messages}
-            className={`h-10 rounded-sm px-4 text-sm font-semibold ${
+            className={`h-11 rounded-lg px-4 text-sm font-bold ${
               viewer.allow_messages
                 ? "border border-line text-ink hover:bg-page"
                 : "bg-gold text-on-gold hover:brightness-95"
@@ -102,7 +111,7 @@ export default async function SettingsPage() {
                 <form action={unblockUser.bind(null, block.blocked_id)}>
                   <button
                     type="submit"
-                    className="h-9 shrink-0 rounded-sm border border-line px-3 text-sm font-semibold hover:bg-page"
+                    className="h-10 shrink-0 rounded-lg border border-line px-3 text-sm font-semibold hover:bg-page"
                   >
                     engeli kaldır
                   </button>
@@ -124,8 +133,8 @@ function SettingsSection({
   children: ReactNode;
 }) {
   return (
-    <div className="border-t border-line px-3 py-4">
-      <h2 className="mb-2 text-sm font-bold text-gold-ink">{title}</h2>
+    <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+      <h2 className="mb-2 text-sm font-bold">{title}</h2>
       {children}
     </div>
   );
