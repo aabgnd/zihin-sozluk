@@ -5,6 +5,7 @@ import { blockUser, unblockUser } from "@/app/ayarlar/actions";
 import Avatar from "@/components/Avatar";
 import EntryCard from "@/components/EntryCard";
 import FollowButton from "@/components/FollowButton";
+import LocalTime from "@/components/LocalTime";
 import RankBadge from "@/components/RankBadge";
 import TitleBadge from "@/components/TitleBadge";
 import UserList, { type UserListItem } from "@/components/UserList";
@@ -50,7 +51,8 @@ export async function generateMetadata({
   params,
 }: PageProps<"/yazar/[username]">): Promise<Metadata> {
   const profile = await loadProfile((await params).username);
-  if (!profile) return { title: { absolute: "yazar bulunamadı – Zihin Sözlük" } };
+  if (!profile)
+    return { title: { absolute: "yazar bulunamadı – Zihin Sözlük" } };
 
   const stats = await loadStats(profile.id);
   const entryCount = stats?.entry_count ?? 0;
@@ -79,37 +81,44 @@ export default async function AuthorPage({
   const viewer = await getViewer();
   const isOwnProfile = viewer?.id === profile.id;
 
-  const [statsResult, favoriteCountResult, summaryResult, followResult, blockResult] =
-    await Promise.all([
-      supabase.rpc("profile_stats", { target: profile.id }),
-      supabase
-        .from("favorites")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile.id),
-      supabase.rpc("profile_summary", { target: profile.id, period }),
-      viewer && !isOwnProfile
-        ? supabase
-            .from("follows")
-            .select("follower_id")
-            .eq("follower_id", viewer.id)
-            .eq("following_id", profile.id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      viewer && !isOwnProfile
-        ? supabase
-            .from("blocks")
-            .select("id")
-            .eq("blocker_id", viewer.id)
-            .eq("blocked_id", profile.id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-    ]);
+  const [
+    statsResult,
+    favoriteCountResult,
+    summaryResult,
+    followResult,
+    blockResult,
+  ] = await Promise.all([
+    supabase.rpc("profile_stats", { target: profile.id }),
+    supabase
+      .from("favorites")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", profile.id),
+    supabase.rpc("profile_summary", { target: profile.id, period }),
+    viewer && !isOwnProfile
+      ? supabase
+          .from("follows")
+          .select("follower_id")
+          .eq("follower_id", viewer.id)
+          .eq("following_id", profile.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    viewer && !isOwnProfile
+      ? supabase
+          .from("blocks")
+          .select("id")
+          .eq("blocker_id", viewer.id)
+          .eq("blocked_id", profile.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
 
   const stats = (
     Array.isArray(statsResult.data) ? statsResult.data[0] : statsResult.data
   ) as Stats | undefined;
   const summary = (
-    Array.isArray(summaryResult.data) ? summaryResult.data[0] : summaryResult.data
+    Array.isArray(summaryResult.data)
+      ? summaryResult.data[0]
+      : summaryResult.data
   ) as SummaryRow | undefined;
   const isFollowing = Boolean(followResult.data);
   const isBlocked = Boolean(blockResult.data);
@@ -122,27 +131,38 @@ export default async function AuthorPage({
   const tabHref = (key: TabKey) =>
     key === "entryler" ? profileHref : `${profileHref}?sekme=${key}`;
   const tabClass = (active: boolean) =>
-    `flex h-11 items-center border-b-2 px-3 text-sm transition-colors ${
-      active ? "border-gold font-semibold text-ink" : "border-transparent text-muted hover:text-ink"
+    `flex h-11 shrink-0 items-center whitespace-nowrap border-b-2 px-3 text-sm transition-colors ${
+      active
+        ? "border-gold font-semibold text-ink"
+        : "border-transparent text-muted hover:text-ink"
     }`;
 
   return (
     <section>
       <header className="flex items-start gap-4 pb-4">
-        <Avatar username={profile.username} url={profile.avatar_url} size="lg" />
+        <Avatar
+          username={profile.username}
+          url={profile.avatar_url}
+          size="lg"
+        />
         <div className="min-w-0 space-y-1.5">
           <h1 className="break-words text-2xl font-bold">{profile.username}</h1>
           <div className="flex flex-wrap items-center gap-1.5">
             <RankBadge entryCount={entryCount} size="md" />
             <TitleBadge generation={profile.generation} title={profile.title} />
-            {ilerleme && <span className="text-[13px] text-muted">{ilerleme}</span>}
+            {ilerleme && (
+              <span className="text-[13px] text-muted">{ilerleme}</span>
+            )}
           </div>
           <p className="text-sm text-muted">
-            {entryCount} entry · {stats?.upvote_total ?? 0} artı oy · {stats?.follower_count ?? 0}{" "}
-            takipçi · katılım {formatDate(profile.created_at)}
+            {entryCount} entry · {stats?.upvote_total ?? 0} artı oy ·{" "}
+            {stats?.follower_count ?? 0} takipçi · katılım{" "}
+            <LocalTime iso={profile.created_at} mode="date" />
           </p>
           {profile.is_banned && (
-            <p className="text-sm font-semibold text-danger">bu yazar uçuruldu.</p>
+            <p className="text-sm font-semibold text-danger">
+              bu yazar uçuruldu.
+            </p>
           )}
           {!profile.is_banned && profile.is_frozen && (
             <p className="text-sm text-muted">bu yazarın hesabı donduruldu.</p>
@@ -158,7 +178,9 @@ export default async function AuthorPage({
             </Link>
           ) : (
             <>
-              {!isBlocked && <FollowButton targetId={profile.id} isFollowing={isFollowing} />}
+              {!isBlocked && (
+                <FollowButton targetId={profile.id} isFollowing={isFollowing} />
+              )}
               {!viewer.isWriter ? (
                 <p className="text-sm text-muted">
                   yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.
@@ -171,9 +193,16 @@ export default async function AuthorPage({
                   mesaj at
                 </Link>
               ) : (
-                <p className="text-sm text-muted">bu yazar özel mesajlarını kapattı.</p>
+                <p className="text-sm text-muted">
+                  bu yazar özel mesajlarını kapattı.
+                </p>
               )}
-              <form action={(isBlocked ? unblockUser : blockUser).bind(null, profile.id)}>
+              <form
+                action={(isBlocked ? unblockUser : blockUser).bind(
+                  null,
+                  profile.id,
+                )}
+              >
                 <button type="submit" className={outlineButton}>
                   {isBlocked ? "engeli kaldır" : "engelle"}
                 </button>
@@ -183,9 +212,16 @@ export default async function AuthorPage({
         </div>
       )}
 
-      <ZihinOzet summary={summary ?? null} period={period} basePath={profileHref} />
+      <ZihinOzet
+        summary={summary ?? null}
+        period={period}
+        basePath={profileHref}
+      />
 
-      <nav aria-label="profil sekmeleri" className="flex flex-wrap border-b border-line">
+      <nav
+        aria-label="profil sekmeleri"
+        className="yatay-kaydir flex border-b border-line"
+      >
         <Link
           href={tabHref("entryler")}
           aria-current={tab === "entryler" ? "page" : undefined}
@@ -219,34 +255,49 @@ export default async function AuthorPage({
       {tab === "takipciler" || tab === "takipedilenler" ? (
         <FollowListSection profileId={profile.id} tab={tab} />
       ) : (
-        <EntryListSection profileId={profile.id} showFavorites={tab === "favoriler"} />
+        <EntryListSection
+          profileId={profile.id}
+          showFavorites={tab === "favoriler"}
+        />
       )}
     </section>
   );
 
-  async function FollowListSection({ profileId, tab }: { profileId: string; tab: TabKey }) {
+  async function FollowListSection({
+    profileId,
+    tab,
+  }: {
+    profileId: string;
+    tab: TabKey;
+  }) {
     const showFollowers = tab === "takipciler";
     const { data: rows } = showFollowers
       ? await supabase
           .from("follows")
-          .select("profil:profiles!follows_follower_id_fkey(id, username, avatar_url)")
+          .select(
+            "profil:profiles!follows_follower_id_fkey(id, username, avatar_url)",
+          )
           .eq("following_id", profileId)
           .order("created_at", { ascending: false })
           .limit(100)
       : await supabase
           .from("follows")
-          .select("profil:profiles!follows_following_id_fkey(id, username, avatar_url)")
+          .select(
+            "profil:profiles!follows_following_id_fkey(id, username, avatar_url)",
+          )
           .eq("follower_id", profileId)
           .order("created_at", { ascending: false })
           .limit(100);
 
-    const people = ((rows ?? []) as unknown as { profil: UserListItem | null }[]).flatMap((row) =>
-      row.profil ? [row.profil] : [],
-    );
+    const people = (
+      (rows ?? []) as unknown as { profil: UserListItem | null }[]
+    ).flatMap((row) => (row.profil ? [row.profil] : []));
     const ids = people.map((person) => person.id);
 
     const [countResult, followingResult] = await Promise.all([
-      ids.length > 0 ? supabase.rpc("user_entry_counts", { ids }) : Promise.resolve({ data: [] }),
+      ids.length > 0
+        ? supabase.rpc("user_entry_counts", { ids })
+        : Promise.resolve({ data: [] }),
       viewer && ids.length > 0
         ? supabase
             .from("follows")
@@ -257,13 +308,14 @@ export default async function AuthorPage({
     ]);
 
     const counts = new Map(
-      ((countResult.data ?? []) as { user_id: string; entry_count: number }[]).map((row) => [
-        row.user_id,
-        row.entry_count,
-      ]),
+      (
+        (countResult.data ?? []) as { user_id: string; entry_count: number }[]
+      ).map((row) => [row.user_id, row.entry_count]),
     );
     const followingIds = new Set(
-      ((followingResult.data ?? []) as { following_id: string }[]).map((row) => row.following_id),
+      ((followingResult.data ?? []) as { following_id: string }[]).map(
+        (row) => row.following_id,
+      ),
     );
 
     const users = people.map((person) => ({
@@ -276,7 +328,11 @@ export default async function AuthorPage({
         users={users}
         viewerId={viewer?.id ?? null}
         followingIds={followingIds}
-        empty={showFollowers ? "henüz takipçisi yok." : "henüz kimseyi takip etmiyor."}
+        empty={
+          showFollowers
+            ? "henüz takipçisi yok."
+            : "henüz kimseyi takip etmiyor."
+        }
       />
     );
   }
@@ -291,7 +347,9 @@ export default async function AuthorPage({
     const { data: rows } = showFavorites
       ? await supabase
           .from("favorites")
-          .select(`entry:entries!favorites_entry_id_fkey!inner(${ENTRY_SELECT})`)
+          .select(
+            `entry:entries!favorites_entry_id_fkey!inner(${ENTRY_SELECT})`,
+          )
           .eq("user_id", profileId)
           .is("entry.deleted_at", null)
           .order("created_at", { ascending: false })
@@ -306,14 +364,16 @@ export default async function AuthorPage({
 
     const entries = (
       showFavorites
-        ? ((rows ?? []) as unknown as { entry: EntryRow | null }[]).flatMap((row) =>
-            row.entry ? [row.entry] : [],
+        ? ((rows ?? []) as unknown as { entry: EntryRow | null }[]).flatMap(
+            (row) => (row.entry ? [row.entry] : []),
           )
         : ((rows ?? []) as unknown as EntryRow[])
     ) as EntryRow[];
 
     const authorIds = [
-      ...new Set(entries.flatMap((entry) => (entry.author ? [entry.author.id] : []))),
+      ...new Set(
+        entries.flatMap((entry) => (entry.author ? [entry.author.id] : [])),
+      ),
     ];
 
     const [{ votes, favorites }, countResult] = await Promise.all([
@@ -326,16 +386,17 @@ export default async function AuthorPage({
         : Promise.resolve({ data: [] }),
     ]);
     const authorCounts = new Map(
-      ((countResult.data ?? []) as { user_id: string; entry_count: number }[]).map((row) => [
-        row.user_id,
-        row.entry_count,
-      ]),
+      (
+        (countResult.data ?? []) as { user_id: string; entry_count: number }[]
+      ).map((row) => [row.user_id, row.entry_count]),
     );
 
     if (entries.length === 0) {
       return (
         <p className="py-4 text-muted">
-          {showFavorites ? "henüz favorilediği entry yok." : "henüz entry girmemiş."}
+          {showFavorites
+            ? "henüz favorilediği entry yok."
+            : "henüz entry girmemiş."}
         </p>
       );
     }
@@ -350,7 +411,9 @@ export default async function AuthorPage({
             isStaff={viewer?.isStaff ?? false}
             myVote={votes.get(entry.id)}
             favorited={favorites.has(entry.id)}
-            authorEntryCount={entry.author ? (authorCounts.get(entry.author.id) ?? null) : null}
+            authorEntryCount={
+              entry.author ? (authorCounts.get(entry.author.id) ?? null) : null
+            }
             showTopic
           />
         ))}
