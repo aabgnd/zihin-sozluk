@@ -43,6 +43,7 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Ban kontrolü burada kalmalı: çerez silip yönlendirme yapabilen tek yer.
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
