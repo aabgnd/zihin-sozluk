@@ -1,12 +1,16 @@
+import { SearchIcon } from "./icons";
+
 export default function SearchForm({
   inputId,
   className,
+  autoFocus = false,
 }: {
   inputId: string;
   className: string;
+  autoFocus?: boolean;
 }) {
   return (
-    <form action="/ara" role="search" className={`gap-2 ${className}`}>
+    <form action="/ara" role="search" className={className}>
       <label htmlFor={inputId} className="sr-only">
         başlık ara
       </label>
@@ -17,14 +21,16 @@ export default function SearchForm({
         required
         maxLength={100}
         autoComplete="off"
-        placeholder="başlık ara"
-        className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-base text-ink placeholder:text-muted focus:border-gold focus:outline-none"
+        autoFocus={autoFocus}
+        placeholder="başlık, #entry, @yazar"
+        className="h-11 min-w-0 flex-1 rounded-l-md border border-r-0 border-line bg-surface px-3 text-[15px] text-ink placeholder:text-muted focus:border-gold focus:outline-none"
       />
       <button
         type="submit"
-        className="h-11 shrink-0 rounded-lg bg-ink px-4 text-[15px] font-semibold text-page hover:opacity-90"
+        aria-label="ara"
+        className="grid h-11 w-12 shrink-0 place-items-center rounded-r-md bg-gold text-on-gold hover:brightness-95"
       >
-        getir
+        <SearchIcon className="size-5" />
       </button>
     </form>
   );

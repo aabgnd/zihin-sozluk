@@ -3,18 +3,16 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
 import AccountNav from "./AccountNav";
-import { SettingsIcon } from "./icons";
 import InfoModal from "./InfoModal";
 import LiveRefresh from "./LiveRefresh";
+import MobileSearch from "./MobileSearch";
 import SearchForm from "./SearchForm";
 import TabBar, { TabLinks } from "./TabBar";
 import ThemeToggle from "./ThemeToggle";
 
-// Dokunma alanı 44px, ikon 28px.
-const goldIconButton =
-  "relative grid size-11 place-items-center rounded-lg text-on-gold hover:bg-black/10";
-const barIconButton =
-  "relative grid size-11 shrink-0 place-items-center rounded-lg border border-line bg-surface text-ink hover:bg-page";
+// Dokunma alanı 44px.
+const iconButton =
+  "relative grid size-11 place-items-center rounded-md text-ink hover:bg-surface-2";
 
 export default async function SiteHeader() {
   const viewer = await getViewer();
@@ -40,7 +38,7 @@ export default async function SiteHeader() {
   }
 
   return (
-    <header>
+    <header className="bg-surface">
       {viewer && (
         <LiveRefresh
           channel={`kullanici:${viewer.id}`}
@@ -53,65 +51,56 @@ export default async function SiteHeader() {
         />
       )}
 
-      <div className="bg-gold text-on-gold">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2 md:px-5 md:py-3">
+      {/* Sarı sadece ince şerit olarak. */}
+      <div className="h-1 bg-gold" />
+
+      <div className="relative border-b border-line">
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4">
           <Link
             href="/"
             aria-label="zihin sözlük ana sayfa"
-            className="mr-auto shrink-0 text-xl font-extrabold lowercase tracking-tight sm:text-2xl md:mr-0"
+            className="shrink-0 text-lg font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
           >
             <span className="text-logo">zihin</span>
-            <span className="ml-[0.1em] text-on-gold">sözlük</span>
+            <span className="ml-[0.1em] text-ink">sözlük</span>
           </Link>
 
           <SearchForm
             inputId="q-genis"
-            className="hidden md:mx-auto md:flex md:min-w-0 md:max-w-md md:flex-1"
+            className="mx-auto hidden w-full max-w-xl md:flex"
           />
 
-          <div className="hidden items-center gap-1 md:flex">
-            <InfoModal className={goldIconButton} />
-            <ThemeToggle className={goldIconButton} />
-          </div>
+          <div className="ml-auto flex items-center gap-0.5 md:ml-0">
+            <div className="md:hidden">
+              <MobileSearch buttonClassName={iconButton} />
+            </div>
+            <InfoModal className={iconButton} />
+            <ThemeToggle className={iconButton} />
 
-          <div className="flex items-center gap-1">
             {viewer ? (
               <AccountNav
                 viewer={viewer}
                 unreadMessages={unreadMessages}
                 unreadNotifications={unreadNotifications}
-                iconButtonClass={goldIconButton}
+                iconButtonClass={iconButton}
               />
             ) : (
               <>
                 <Link
                   href="/giris"
-                  className="flex h-11 items-center rounded-lg px-3 text-[15px] font-semibold hover:bg-black/10"
+                  className="hidden h-11 items-center rounded-md px-3 text-[15px] hover:bg-surface-2 sm:flex"
                 >
                   giriş
                 </Link>
                 <Link
                   href="/kayit"
-                  className="flex h-11 items-center rounded-lg bg-ink px-4 text-[15px] font-semibold text-page hover:opacity-90"
+                  className="flex h-11 items-center rounded-md bg-gold px-4 text-[15px] font-semibold text-on-gold hover:brightness-95"
                 >
                   kaydol
                 </Link>
               </>
             )}
           </div>
-        </div>
-      </div>
-
-      <div className="border-b border-line bg-surface md:hidden">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2">
-          <SearchForm inputId="q" className="flex min-w-0 flex-1" />
-          {viewer && (
-            <Link href="/ayarlar" aria-label="ayarlar" className={barIconButton}>
-              <SettingsIcon className="size-7" />
-            </Link>
-          )}
-          <InfoModal className={barIconButton} />
-          <ThemeToggle className={barIconButton} />
         </div>
       </div>
 

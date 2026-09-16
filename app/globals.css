@@ -3,43 +3,45 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --page: #faf6ed;
+  /* Zemin beyaz; kutu yerine ince çizgi ve boşluk kullanılır. */
+  --page: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --ink: #0f172a;
-  --muted: #475569;
-  --line: #e2e8f0;
+  --surface-2: #f6f6f7;
+  --ink: #222222;
+  --muted: #6b7280;
+  --line: #ececee;
+  /* Parlak sarı: sadece dolgu (şerit, buton, aktif çizgi). */
   --gold: #facc15;
-  --gold-ink: #854d0e;
-  --on-gold: #0f172a;
-  /* Logodaki "zihin" kelimesi: sarı header üzerinde okunan koyu amber. */
+  /* Koyu altın: yazı olarak kullanılan her yer. */
+  --gold-ink: #8a5a00;
+  --on-gold: #1a1a1a;
   --logo: #8a5a00;
-  --bar: #facc15;
-  --bar-2: #f1f5f9;
-  --on-bar: #0f172a;
-  --danger: #b91c1c;
+  --bar: #ffffff;
+  --bar-2: #f6f6f7;
+  --on-bar: #222222;
+  --danger: #b42318;
   --alert: #dc2626;
   --on-alert: #ffffff;
 }
 
 :root.dark {
-  --page: #0f172a;
-  --surface: #1e293b;
-  --surface-2: #334155;
-  --ink: #f1f5f9;
-  --muted: #94a3b8;
-  --line: #334155;
+  --page: #16181d;
+  --surface: #1b1e24;
+  --surface-2: #23262d;
+  --ink: #e6e7ea;
+  --muted: #9aa0aa;
+  --line: #2a2e36;
   --gold: #facc15;
-  --gold-ink: #facc15;
-  --on-gold: #0f172a;
-  /* Header karanlık modda da sarı kaldığı için logo renkleri aynı kalır. */
-  --logo: #8a5a00;
-  --bar: #facc15;
-  --bar-2: #334155;
-  --on-bar: #0f172a;
+  /* Koyu zeminde okunan açık altın. */
+  --gold-ink: #f0c84a;
+  --on-gold: #16181d;
+  --logo: #f0c84a;
+  --bar: #1b1e24;
+  --bar-2: #23262d;
+  --on-bar: #e6e7ea;
   --danger: #fca5a5;
   --alert: #ef4444;
-  --on-alert: #0f172a;
+  --on-alert: #16181d;
 }
 
 @theme inline {
@@ -60,4 +62,26 @@
   --color-alert: var(--alert);
   --color-on-alert: var(--on-alert);
   --font-sans: var(--font-source-sans), system-ui, sans-serif;
+}
+
+/* Sol sütunun kendi kaydırma çubuğu ince ve sade. */
+@layer utilities {
+  .ince-kaydirma {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+}
+
+/* Sayfa kısa kaldığında altta beyaz şerit kalmasın. */
+html {
+  background-color: var(--page);
+}
+
+a,
+button {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
 }

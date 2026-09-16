@@ -152,6 +152,47 @@ export function ChevronDownIcon({ className }: IconProps) {
   );
 }
 
+export function SearchIcon({ className }: IconProps) {
+  return (
+    <svg {...solid} className={className}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10.8 3a7.8 7.8 0 1 0 4.7 14l4.3 4.3a1.2 1.2 0 0 0 1.7-1.7L17.2 15A7.8 7.8 0 0 0 10.8 3Zm0 2.4a5.4 5.4 0 1 1 0 10.8 5.4 5.4 0 0 1 0-10.8Z"
+      />
+    </svg>
+  );
+}
+
+export function ShareIcon({ className }: IconProps) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="M12 15V4" />
+      <path d="m8 7.5 4-3.5 4 3.5" />
+      <path d="M5 12v6.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V12" />
+    </svg>
+  );
+}
+
+export function MoreIcon({ className }: IconProps) {
+  return (
+    <svg {...solid} className={className}>
+      <circle cx="5.5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="18.5" cy="12" r="1.8" />
+    </svg>
+  );
+}
+
+export function ArrowUpIcon({ className }: IconProps) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="M12 19V5" />
+      <path d="m5 12 7-7 7 7" />
+    </svg>
+  );
+}
+
 export function XIcon({ className }: IconProps) {
   return (
     <svg {...stroke} className={className}>
