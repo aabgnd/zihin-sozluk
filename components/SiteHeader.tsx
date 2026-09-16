@@ -12,9 +12,9 @@ import TabBar, { TabLinks } from "./TabBar";
 import ThemeToggle from "./ThemeToggle";
 import TopicSidebar from "./TopicSidebar";
 
-// Dokunma alanı 44px.
+// Dokunma alanı sm üstünde 44px; 360px'de yedi öğe sığsın diye mobilde 40px.
 const iconButton =
-  "relative grid size-11 place-items-center rounded-md text-ink hover:bg-surface-2";
+  "relative grid size-10 place-items-center rounded-md text-ink hover:bg-surface-2 sm:size-11";
 
 export default async function SiteHeader() {
   const viewer = await getViewer();
@@ -57,17 +57,12 @@ export default async function SiteHeader() {
       <div className="h-1 bg-gold" />
 
       <div className="relative border-b border-line">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-1.5 px-4 sm:gap-3">
-          {/* Telefonda header kalabalık olmasın: bilgi ve tema çekmecenin içinde. */}
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-1 px-4 sm:gap-3">
+          {/* Bilgi (i) çekmecede; tema ana ekranda kalır. */}
           <div className="lg:hidden">
             <MobileAgendaDrawer
               buttonClassName={iconButton}
-              footer={
-                <>
-                  <InfoModal className={iconButton} />
-                  <ThemeToggle className={iconButton} />
-                </>
-              }
+              footer={<InfoModal className={iconButton} />}
             >
               <TopicSidebar />
             </MobileAgendaDrawer>
@@ -76,7 +71,7 @@ export default async function SiteHeader() {
           <Link
             href="/"
             aria-label="zihin sözlük ana sayfa"
-            className="shrink-0 text-lg font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
+            className="shrink-0 text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
           >
             <span className="text-logo">zihin</span>
             <span className="ml-[0.1em] text-ink">sözlük</span>
@@ -87,6 +82,7 @@ export default async function SiteHeader() {
             className="mx-auto hidden w-full max-w-xl md:flex"
           />
 
+          {/* Sıra: arama, tema, mesajlar, bildirimler, avatar. */}
           <div className="ml-auto flex items-center gap-0.5 md:ml-0">
             <div className="md:hidden">
               <MobileSearch buttonClassName={iconButton} />
@@ -94,9 +90,7 @@ export default async function SiteHeader() {
             <div className="hidden lg:block">
               <InfoModal className={iconButton} />
             </div>
-            <div className="hidden lg:block">
-              <ThemeToggle className={iconButton} />
-            </div>
+            <ThemeToggle className={iconButton} />
 
             {viewer ? (
               <AccountNav
@@ -109,13 +103,13 @@ export default async function SiteHeader() {
               <>
                 <Link
                   href="/giris"
-                  className="hidden h-11 items-center rounded-md px-3 text-[15px] hover:bg-surface-2 sm:flex"
+                  className="flex h-10 shrink-0 items-center rounded-md border border-line px-2.5 text-sm hover:bg-surface-2 sm:h-11 sm:px-4 sm:text-[15px]"
                 >
-                  giriş
+                  giriş yap
                 </Link>
                 <Link
                   href="/kayit"
-                  className="flex h-11 items-center rounded-md bg-gold px-4 text-[15px] font-semibold text-on-gold hover:brightness-95"
+                  className="flex h-10 shrink-0 items-center rounded-md bg-gold px-2.5 text-sm font-semibold text-on-gold hover:brightness-95 sm:h-11 sm:px-4 sm:text-[15px]"
                 >
                   kaydol
                 </Link>
