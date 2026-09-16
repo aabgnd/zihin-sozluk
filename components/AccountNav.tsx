@@ -24,6 +24,11 @@ type Props = {
 const menuItem =
   "flex h-11 w-full items-center gap-2.5 px-4 text-left text-[15px] hover:bg-page";
 
+// 9'dan fazlası "9+" olarak gösterilir.
+function badgeText(count: number) {
+  return count > 9 ? "9+" : String(count);
+}
+
 export default function AccountNav({
   viewer,
   unreadMessages,
@@ -48,7 +53,9 @@ export default function AccountNav({
         className={iconButtonClass}
       >
         <MessageIcon className="size-5" />
-        {unreadMessages > 0 && <CountBadge>{unreadMessages}</CountBadge>}
+        {unreadMessages > 0 && (
+          <CountBadge>{badgeText(unreadMessages)}</CountBadge>
+        )}
       </Link>
 
       <Link
@@ -59,7 +66,7 @@ export default function AccountNav({
       >
         <BellIcon className="size-5" />
         {unreadNotifications > 0 && (
-          <CountBadge>{unreadNotifications}</CountBadge>
+          <CountBadge>{badgeText(unreadNotifications)}</CountBadge>
         )}
       </Link>
 
