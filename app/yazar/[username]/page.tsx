@@ -17,7 +17,7 @@ import type { EntryRow, PublicProfile } from "@/lib/types";
 import { getViewer, PROFILE_COLUMNS } from "@/lib/viewer";
 
 const outlineButton =
-  "flex h-10 items-center rounded-lg border border-line px-4 text-sm font-semibold hover:bg-page";
+  "flex h-10 items-center rounded-md border border-line px-4 text-sm hover:bg-surface-2";
 
 const TABS = ["entryler", "favoriler", "takipciler", "takipedilenler"] as const;
 type TabKey = (typeof TABS)[number];
@@ -119,77 +119,73 @@ export default async function AuthorPage({
   const ilerleme = rutbeIlerlemesi(entryCount);
 
   const profileHref = `/yazar/${encodeURIComponent(profile.username)}`;
-  const tabHref = (key: TabKey) => (key === "entryler" ? profileHref : `${profileHref}?sekme=${key}`);
+  const tabHref = (key: TabKey) =>
+    key === "entryler" ? profileHref : `${profileHref}?sekme=${key}`;
   const tabClass = (active: boolean) =>
-    `flex h-11 items-center border-b-2 px-3 text-sm ${
-      active ? "border-gold font-bold text-ink" : "border-transparent text-muted hover:text-ink"
+    `flex h-11 items-center border-b-2 px-3 text-sm transition-colors ${
+      active ? "border-gold font-semibold text-ink" : "border-transparent text-muted hover:text-ink"
     }`;
 
   return (
-    <section className="space-y-3">
-      <header className="rounded-xl border border-line bg-surface shadow-sm">
-        <div className="flex items-start gap-4 p-4">
-          <Avatar username={profile.username} url={profile.avatar_url} size="lg" />
-          <div className="min-w-0 space-y-1.5">
-            <h1 className="break-words text-xl font-bold">{profile.username}</h1>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <RankBadge entryCount={entryCount} size="md" />
-              <TitleBadge generation={profile.generation} title={profile.title} />
-              {ilerleme && <span className="text-[13px] text-muted">{ilerleme}</span>}
-            </div>
-            <p className="text-sm text-muted">
-              {entryCount} entry · {stats?.upvote_total ?? 0} artı oy ·{" "}
-              {stats?.follower_count ?? 0} takipçi · katılım {formatDate(profile.created_at)}
-            </p>
-            {profile.is_banned && (
-              <p className="text-sm font-semibold text-danger">bu yazar uçuruldu.</p>
-            )}
-            {!profile.is_banned && profile.is_frozen && (
-              <p className="text-sm text-muted">bu yazarın hesabı donduruldu.</p>
-            )}
+    <section>
+      <header className="flex items-start gap-4 pb-4">
+        <Avatar username={profile.username} url={profile.avatar_url} size="lg" />
+        <div className="min-w-0 space-y-1.5">
+          <h1 className="break-words text-2xl font-bold">{profile.username}</h1>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <RankBadge entryCount={entryCount} size="md" />
+            <TitleBadge generation={profile.generation} title={profile.title} />
+            {ilerleme && <span className="text-[13px] text-muted">{ilerleme}</span>}
           </div>
+          <p className="text-sm text-muted">
+            {entryCount} entry · {stats?.upvote_total ?? 0} artı oy · {stats?.follower_count ?? 0}{" "}
+            takipçi · katılım {formatDate(profile.created_at)}
+          </p>
+          {profile.is_banned && (
+            <p className="text-sm font-semibold text-danger">bu yazar uçuruldu.</p>
+          )}
+          {!profile.is_banned && profile.is_frozen && (
+            <p className="text-sm text-muted">bu yazarın hesabı donduruldu.</p>
+          )}
         </div>
-
-        {viewer && (
-          <div className="flex flex-wrap items-center gap-2 px-4 pb-4">
-            {isOwnProfile ? (
-              <Link href="/ayarlar" className={outlineButton}>
-                ayarlar
-              </Link>
-            ) : (
-              <>
-                {!isBlocked && <FollowButton targetId={profile.id} isFollowing={isFollowing} />}
-                {!viewer.isWriter ? (
-                  <p className="text-sm text-muted">
-                    yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.
-                  </p>
-                ) : profile.allow_messages ? (
-                  <Link
-                    href={`/mesajlar/${encodeURIComponent(profile.username)}`}
-                    className={outlineButton}
-                  >
-                    mesaj at
-                  </Link>
-                ) : (
-                  <p className="text-sm text-muted">bu yazar özel mesajlarını kapattı.</p>
-                )}
-                <form action={(isBlocked ? unblockUser : blockUser).bind(null, profile.id)}>
-                  <button type="submit" className={outlineButton}>
-                    {isBlocked ? "engeli kaldır" : "engelle"}
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
-        )}
       </header>
+
+      {viewer && (
+        <div className="flex flex-wrap items-center gap-2 border-t border-line py-4">
+          {isOwnProfile ? (
+            <Link href="/ayarlar" className={outlineButton}>
+              ayarlar
+            </Link>
+          ) : (
+            <>
+              {!isBlocked && <FollowButton targetId={profile.id} isFollowing={isFollowing} />}
+              {!viewer.isWriter ? (
+                <p className="text-sm text-muted">
+                  yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.
+                </p>
+              ) : profile.allow_messages ? (
+                <Link
+                  href={`/mesajlar/${encodeURIComponent(profile.username)}`}
+                  className={outlineButton}
+                >
+                  mesaj at
+                </Link>
+              ) : (
+                <p className="text-sm text-muted">bu yazar özel mesajlarını kapattı.</p>
+              )}
+              <form action={(isBlocked ? unblockUser : blockUser).bind(null, profile.id)}>
+                <button type="submit" className={outlineButton}>
+                  {isBlocked ? "engeli kaldır" : "engelle"}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      )}
 
       <ZihinOzet summary={summary ?? null} period={period} basePath={profileHref} />
 
-      <nav
-        aria-label="profil sekmeleri"
-        className="flex flex-wrap rounded-xl border border-line bg-surface px-2 shadow-sm"
-      >
+      <nav aria-label="profil sekmeleri" className="flex flex-wrap border-b border-line">
         <Link
           href={tabHref("entryler")}
           aria-current={tab === "entryler" ? "page" : undefined}
@@ -250,9 +246,7 @@ export default async function AuthorPage({
     const ids = people.map((person) => person.id);
 
     const [countResult, followingResult] = await Promise.all([
-      ids.length > 0
-        ? supabase.rpc("user_entry_counts", { ids })
-        : Promise.resolve({ data: [] }),
+      ids.length > 0 ? supabase.rpc("user_entry_counts", { ids }) : Promise.resolve({ data: [] }),
       viewer && ids.length > 0
         ? supabase
             .from("follows")
@@ -278,14 +272,12 @@ export default async function AuthorPage({
     }));
 
     return (
-      <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
-        <UserList
-          users={users}
-          viewerId={viewer?.id ?? null}
-          followingIds={followingIds}
-          empty={showFollowers ? "henüz takipçisi yok." : "henüz kimseyi takip etmiyor."}
-        />
-      </div>
+      <UserList
+        users={users}
+        viewerId={viewer?.id ?? null}
+        followingIds={followingIds}
+        empty={showFollowers ? "henüz takipçisi yok." : "henüz kimseyi takip etmiyor."}
+      />
     );
   }
 
@@ -320,21 +312,36 @@ export default async function AuthorPage({
         : ((rows ?? []) as unknown as EntryRow[])
     ) as EntryRow[];
 
-    const { votes, favorites } = await getViewerEntryState(
-      viewer?.id ?? null,
-      entries.map((entry) => entry.id),
+    const authorIds = [
+      ...new Set(entries.flatMap((entry) => (entry.author ? [entry.author.id] : []))),
+    ];
+
+    const [{ votes, favorites }, countResult] = await Promise.all([
+      getViewerEntryState(
+        viewer?.id ?? null,
+        entries.map((entry) => entry.id),
+      ),
+      authorIds.length > 0
+        ? supabase.rpc("user_entry_counts", { ids: authorIds })
+        : Promise.resolve({ data: [] }),
+    ]);
+    const authorCounts = new Map(
+      ((countResult.data ?? []) as { user_id: string; entry_count: number }[]).map((row) => [
+        row.user_id,
+        row.entry_count,
+      ]),
     );
 
     if (entries.length === 0) {
       return (
-        <p className="rounded-xl border border-line bg-surface p-4 text-muted shadow-sm">
+        <p className="py-4 text-muted">
           {showFavorites ? "henüz favorilediği entry yok." : "henüz entry girmemiş."}
         </p>
       );
     }
 
     return (
-      <div className="space-y-3">
+      <div>
         {entries.map((entry) => (
           <EntryCard
             key={entry.id}
@@ -343,6 +350,7 @@ export default async function AuthorPage({
             isStaff={viewer?.isStaff ?? false}
             myVote={votes.get(entry.id)}
             favorited={favorites.has(entry.id)}
+            authorEntryCount={entry.author ? (authorCounts.get(entry.author.id) ?? null) : null}
             showTopic
           />
         ))}

@@ -28,10 +28,8 @@ export default async function MessagesPage() {
 
   const conversations = new Map<string, { last: MessageRow; unread: number }>();
   for (const message of messages) {
-    const otherId =
-      message.sender_id === viewer.id ? message.receiver_id : message.sender_id;
-    const unread =
-      message.receiver_id === viewer.id && !message.is_read ? 1 : 0;
+    const otherId = message.sender_id === viewer.id ? message.receiver_id : message.sender_id;
+    const unread = message.receiver_id === viewer.id && !message.is_read ? 1 : 0;
     const conversation = conversations.get(otherId);
     if (conversation) conversation.unread += unread;
     else conversations.set(otherId, { last: message, unread });
@@ -39,17 +37,12 @@ export default async function MessagesPage() {
 
   const otherIds = [...conversations.keys()];
   const { data: peopleData } = otherIds.length
-    ? await supabase
-        .from("profiles")
-        .select("id, username, avatar_url")
-        .in("id", otherIds)
+    ? await supabase.from("profiles").select("id, username, avatar_url").in("id", otherIds)
     : { data: [] };
-  const people = new Map(
-    ((peopleData ?? []) as Person[]).map((person) => [person.id, person]),
-  );
+  const people = new Map(((peopleData ?? []) as Person[]).map((person) => [person.id, person]));
 
   return (
-    <section className="space-y-3">
+    <section>
       <LiveRefresh
         channel={`mesaj-kutusu:${viewer.id}`}
         subscriptions={[
@@ -57,41 +50,32 @@ export default async function MessagesPage() {
           { table: "messages", filter: `sender_id=eq.${viewer.id}` },
         ]}
       />
-      <h1 className="text-xl font-bold">mesajlar</h1>
+      <h1 className="border-b border-line pb-3 text-2xl font-bold">mesajlar</h1>
 
       {conversations.size === 0 ? (
-        <p className="rounded-xl border border-line bg-surface p-4 leading-relaxed text-muted shadow-sm">
+        <p className="py-4 leading-relaxed text-muted">
           {
-            'henüz mesajın yok. bir yazarın profilinden ya da entry\'sinin altındaki "mesaj at" ile yazışmaya başlayabilirsin.'
+            "henüz mesajın yok. bir yazarın profilinden ya da entry'sinin altındaki menüden yazışmaya başlayabilirsin."
           }
         </p>
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+        <ul>
           {[...conversations.entries()].map(([otherId, { last, unread }]) => {
             const person = people.get(otherId);
             if (!person) return null;
             return (
-              <li key={otherId}>
+              <li key={otherId} className="border-b border-line">
                 <Link
                   href={`/mesajlar/${encodeURIComponent(person.username)}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-page"
+                  className="flex items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
                 >
-                  <Avatar
-                    username={person.username}
-                    url={person.avatar_url}
-                    size="md"
-                  />
+                  <Avatar username={person.username} url={person.avatar_url} size="md" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span
-                        className={`break-words ${unread > 0 ? "font-bold" : "font-semibold"}`}
-                      >
+                      <span className={`break-words ${unread > 0 ? "font-bold" : "font-semibold"}`}>
                         {person.username}
                       </span>
-                      <time
-                        dateTime={last.created_at}
-                        className="shrink-0 text-xs text-muted"
-                      >
+                      <time dateTime={last.created_at} className="shrink-0 text-xs text-muted">
                         {formatDateTime(last.created_at)}
                       </time>
                     </div>

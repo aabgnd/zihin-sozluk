@@ -10,15 +10,12 @@ export default async function SignupPage() {
   if (await getViewer()) redirect("/");
 
   return (
-    <section className="mx-auto max-w-sm rounded-xl border border-line bg-surface p-5 shadow-sm">
-      <h1 className="mb-5 text-xl font-bold">kaydol</h1>
+    <section className="mx-auto max-w-sm py-4">
+      <h1 className="mb-5 text-2xl font-bold">kaydol</h1>
       <SignupForm />
       <p className="mt-6 text-sm text-muted">
         zaten hesabın var mı?{" "}
-        <Link
-          href="/giris"
-          className="font-semibold text-gold-ink hover:underline"
-        >
+        <Link href="/giris" className="font-semibold text-gold-ink hover:underline">
           giriş yap
         </Link>
       </p>

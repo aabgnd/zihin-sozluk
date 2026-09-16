@@ -17,23 +17,17 @@ export default async function LoginPage({ searchParams }: PageProps<"/giris">) {
   const notice = NOTICES[firstParam((await searchParams).hata) ?? ""];
 
   return (
-    <section className="mx-auto max-w-sm rounded-xl border border-line bg-surface p-5 shadow-sm">
-      <h1 className="mb-5 text-xl font-bold">giriş</h1>
+    <section className="mx-auto max-w-sm py-4">
+      <h1 className="mb-5 text-2xl font-bold">giriş</h1>
       {notice && (
-        <p
-          role="alert"
-          className="mb-4 rounded-lg border border-danger px-3 py-2 text-sm text-danger"
-        >
+        <p role="alert" className="mb-4 rounded-md border border-danger px-3 py-2 text-sm text-danger">
           {notice}
         </p>
       )}
       <LoginForm />
       <p className="mt-6 text-sm text-muted">
         hesabın yok mu?{" "}
-        <Link
-          href="/kayit"
-          className="font-semibold text-gold-ink hover:underline"
-        >
+        <Link href="/kayit" className="font-semibold text-gold-ink hover:underline">
           kaydol
         </Link>
       </p>

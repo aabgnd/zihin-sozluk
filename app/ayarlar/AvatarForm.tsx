@@ -37,8 +37,7 @@ export default function AvatarForm() {
   return (
     <form action={formAction} className="min-w-0 flex-1 space-y-2">
       <label htmlFor="avatar" className="block text-sm font-semibold">
-        yeni fotoğraf{" "}
-        <span className="font-normal text-muted">(jpg, png, webp · en fazla 2 mb)</span>
+        yeni fotoğraf <span className="font-normal text-muted">(jpg, png, webp · en fazla 2 mb)</span>
       </label>
       <input
         id="avatar"
@@ -47,7 +46,7 @@ export default function AvatarForm() {
         accept="image/jpeg,image/png,image/webp"
         required
         onChange={checkFile}
-        className="block w-full text-sm text-muted file:mr-3 file:h-10 file:cursor-pointer file:rounded-lg file:border-0 file:bg-bar-2 file:px-3 file:font-semibold file:text-ink"
+        className="block w-full text-sm text-muted file:mr-3 file:h-10 file:cursor-pointer file:rounded-md file:border file:border-line file:bg-surface file:px-3 file:text-ink"
       />
       {error && (
         <p role="alert" className="text-sm text-danger">
@@ -62,7 +61,7 @@ export default function AvatarForm() {
       <button
         type="submit"
         disabled={pending}
-        className="h-11 rounded-lg bg-gold px-4 text-sm font-bold text-on-gold hover:brightness-95 disabled:opacity-60"
+        className="h-10 rounded-md bg-gold px-4 text-sm font-semibold text-on-gold hover:brightness-95 disabled:opacity-60"
       >
         {pending ? "yükleniyor…" : "fotoğrafı değiştir"}
       </button>

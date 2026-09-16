@@ -15,9 +15,7 @@ import MessageForm from "../MessageForm";
 
 export const metadata: Metadata = { title: "sohbet" };
 
-export default async function ConversationPage({
-  params,
-}: PageProps<"/mesajlar/[username]">) {
+export default async function ConversationPage({ params }: PageProps<"/mesajlar/[username]">) {
   const viewer = await getViewer();
   if (!viewer) redirect("/giris");
 
@@ -44,13 +42,11 @@ export default async function ConversationPage({
     getMessageBlocker(viewer, other),
   ]);
   const messages = ((messageData ?? []) as MessageRow[]).reverse();
-  const unread = messages.filter(
-    (message) => message.receiver_id === viewer.id && !message.is_read,
-  );
+  const unread = messages.filter((message) => message.receiver_id === viewer.id && !message.is_read);
   const lastUnread = unread.at(-1);
 
   return (
-    <section className="overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+    <section>
       <LiveRefresh
         channel={`sohbet:${viewer.id}:${other.id}`}
         subscriptions={[
@@ -59,56 +55,40 @@ export default async function ConversationPage({
         ]}
       />
       {lastUnread && (
-        <MarkRead
-          key={lastUnread.id}
-          action={markConversationRead.bind(null, other.id)}
-        />
+        <MarkRead key={lastUnread.id} action={markConversationRead.bind(null, other.id)} />
       )}
 
-      <header className="flex items-center gap-3 border-b border-line px-4 py-2">
-        <Link
-          href="/mesajlar"
-          className="flex h-11 items-center pr-2 text-sm text-muted hover:text-ink"
-        >
+      <header className="flex items-center gap-3 border-b border-line pb-3">
+        <Link href="/mesajlar" className="text-sm text-muted hover:text-ink">
           ‹ mesajlar
         </Link>
         <Link
           href={`/yazar/${encodeURIComponent(other.username)}`}
-          className="ml-auto inline-flex min-w-0 items-center gap-2 font-bold text-gold-ink hover:underline"
+          className="ml-auto inline-flex min-w-0 items-center gap-2 font-semibold text-gold-ink hover:underline"
         >
           <span className="break-words">{other.username}</span>
           <Avatar username={other.username} url={other.avatar_url} size="md" />
         </Link>
       </header>
 
-      <ol
-        aria-label={`${other.username} ile mesajlar`}
-        className="space-y-2 px-4 py-4"
-      >
+      <ol aria-label={`${other.username} ile mesajlar`} className="space-y-2 py-5">
         {messages.length === 0 && (
-          <li className="text-sm text-muted">
-            henüz mesajlaşmadınız. ilk mesajı sen yaz.
-          </li>
+          <li className="text-sm text-muted">henüz mesajlaşmadınız. ilk mesajı sen yaz.</li>
         )}
         {messages.map((message) => {
           const mine = message.sender_id === viewer.id;
           return (
-            <li
-              key={message.id}
-              className={`flex ${mine ? "justify-end" : "justify-start"}`}
-            >
+            <li key={message.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[85%] rounded-xl border px-3 py-2 ${
-                  mine ? "border-gold bg-gold/15" : "border-line bg-page"
+                className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
+                  mine ? "bg-gold/15" : "bg-surface-2"
                 }`}
               >
                 <p className="whitespace-pre-line break-words text-[15px] leading-6">
                   {message.content}
                 </p>
                 <p className="mt-1 text-right text-[11px] text-muted">
-                  <time dateTime={message.created_at}>
-                    {formatDateTime(message.created_at)}
-                  </time>
+                  <time dateTime={message.created_at}>{formatDateTime(message.created_at)}</time>
                   {mine && message.is_read && " · okundu"}
                 </p>
               </div>
@@ -119,9 +99,7 @@ export default async function ConversationPage({
       <ScrollAnchor key={messages.length} />
 
       {blocker ? (
-        <p className="border-t border-line px-4 py-4 text-sm leading-relaxed text-muted">
-          {blocker}
-        </p>
+        <p className="border-t border-line py-4 text-sm leading-relaxed text-muted">{blocker}</p>
       ) : (
         <MessageForm action={sendMessage.bind(null, other.id)} />
       )}

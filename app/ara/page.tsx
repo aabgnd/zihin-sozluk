@@ -6,12 +6,7 @@ import EntryEditor from "@/components/EntryEditor";
 import TopicList from "@/components/TopicList";
 import { isPermanentMute } from "@/lib/moderation";
 import { createClient } from "@/lib/supabase/server";
-import {
-  firstParam,
-  formatDateTime,
-  normalizeTitle,
-  slugify,
-} from "@/lib/text";
+import { firstParam, formatDateTime, normalizeTitle, slugify } from "@/lib/text";
 import type { TopicListItem, Viewer } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
@@ -50,23 +45,23 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
   const similar = (data ?? []) as TopicListItem[];
 
   return (
-    <section className="space-y-3">
-      <header className="rounded-xl border border-line bg-surface p-4 shadow-sm">
-        <h1 className="break-words text-xl font-bold leading-snug">{query}</h1>
+    <section>
+      <header className="border-b border-line pb-3">
+        <h1 className="break-words text-2xl font-bold leading-snug">{query}</h1>
         <p className="mt-1 text-sm text-muted">
           {"bu başlık henüz açılmamış, ilk entry'yi sen yaz."}
         </p>
       </header>
 
-      <FirstEntry viewer={viewer} query={query} slug={slug} />
+      <div className="py-5">
+        <FirstEntry viewer={viewer} query={query} slug={slug} />
+      </div>
 
       {similar.length > 0 && (
-        <>
-          <h2 className="pt-2 text-sm font-bold text-muted">
-            benzer başlıklar
-          </h2>
+        <section className="border-t border-line pt-5">
+          <h2 className="pb-2 text-sm font-semibold text-muted">benzer başlıklar</h2>
           <TopicList topics={similar} empty="" />
-        </>
+        </section>
       )}
     </section>
   );
@@ -81,17 +76,11 @@ function FirstEntry({
   query: string;
   slug: string;
 }) {
-  const card =
-    "rounded-xl border border-line bg-surface p-4 text-muted shadow-sm";
-
   if (!viewer) {
     return (
-      <p className={card}>
+      <p className="text-muted">
         {"ilk entry'yi yazmak için "}
-        <Link
-          href="/giris"
-          className="font-semibold text-gold-ink hover:underline"
-        >
+        <Link href="/giris" className="font-semibold text-gold-ink hover:underline">
           giriş yap
         </Link>
         .
@@ -100,14 +89,12 @@ function FirstEntry({
   }
   if (!viewer.isWriter) {
     return (
-      <p className={card}>
-        yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.
-      </p>
+      <p className="text-muted">yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.</p>
     );
   }
   if (viewer.isMuted && viewer.mutedUntil) {
     return (
-      <p className={card}>
+      <p className="text-muted">
         {isPermanentMute(viewer.mutedUntil)
           ? "moderasyon tarafından süresiz susturuldun."
           : `moderasyon tarafından ${formatDateTime(viewer.mutedUntil)} tarihine kadar susturuldun.`}
@@ -115,12 +102,10 @@ function FirstEntry({
     );
   }
   if (viewer.is_frozen) {
-    return (
-      <p className={card}>hesabın dondurulduğu için şu an entry yazamazsın.</p>
-    );
+    return <p className="text-muted">hesabın dondurulduğu için şu an entry yazamazsın.</p>;
   }
   if (!slug) {
-    return <p className={card}>başlıkta en az bir harf ya da rakam olmalı.</p>;
+    return <p className="text-muted">başlıkta en az bir harf ya da rakam olmalı.</p>;
   }
   return (
     <EntryEditor

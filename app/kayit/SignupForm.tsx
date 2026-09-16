@@ -7,17 +7,11 @@ import { RULES_TEXT, RULES_TITLE } from "@/lib/text";
 import type { FormState } from "@/lib/types";
 
 export default function SignupForm() {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(
-    signUp,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<FormState, FormData>(signUp, {});
 
   if (state.message) {
     return (
-      <p
-        role="status"
-        className="rounded-lg border border-gold bg-gold/10 px-4 py-3 leading-relaxed"
-      >
+      <p role="status" className="rounded-md border border-line px-4 py-3 leading-relaxed">
         {state.message}
       </p>
     );
@@ -33,13 +27,7 @@ export default function SignupForm() {
         maxLength={30}
         required
       />
-      <Field
-        label="e-posta"
-        name="email"
-        type="email"
-        autoComplete="email"
-        required
-      />
+      <Field label="e-posta" name="email" type="email" autoComplete="email" required />
       <Field
         label="şifre (en az 8 karakter)"
         name="password"
@@ -48,20 +36,11 @@ export default function SignupForm() {
         minLength={8}
         required
       />
-      <div className="rounded-lg border border-line bg-page p-3 text-sm">
-        <p className="font-bold">{RULES_TITLE}</p>
+      <div className="rounded-md border border-line p-3 text-sm">
+        <p className="font-semibold">{RULES_TITLE}</p>
         <p className="mt-1 leading-relaxed text-muted">{RULES_TEXT}</p>
-        <label
-          htmlFor="rules"
-          className="mt-3 flex items-center gap-2 font-semibold"
-        >
-          <input
-            id="rules"
-            name="rules"
-            type="checkbox"
-            required
-            className="size-4 accent-gold"
-          />
+        <label htmlFor="rules" className="mt-3 flex items-center gap-2 font-semibold">
+          <input id="rules" name="rules" type="checkbox" required className="size-4 accent-gold" />
           okudum, kabul ediyorum
         </label>
       </div>
@@ -73,7 +52,7 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={pending}
-        className="h-11 w-full rounded-lg bg-gold font-bold text-on-gold hover:brightness-95 disabled:opacity-60"
+        className="h-11 w-full rounded-md bg-gold text-sm font-semibold text-on-gold hover:brightness-95 disabled:opacity-60"
       >
         {pending ? "kaydediliyor…" : "kaydol"}
       </button>

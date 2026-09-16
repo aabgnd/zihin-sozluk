@@ -30,12 +30,12 @@ export default async function SettingsPage() {
   const blocks = (data ?? []) as unknown as BlockRow[];
 
   return (
-    <section className="space-y-3">
-      <h1 className="text-xl font-bold">ayarlar</h1>
+    <section>
+      <h1 className="border-b border-line pb-3 text-2xl font-bold">ayarlar</h1>
 
       <SettingsSection title="görünüm">
         <div className="flex flex-wrap items-center gap-3">
-          <ThemeToggle className="grid size-11 place-items-center rounded-lg border border-line hover:bg-page" />
+          <ThemeToggle className="grid size-11 place-items-center rounded-md border border-line hover:bg-surface-2" />
           <p className="text-sm text-muted">
             açık ve karanlık mod arasında geçiş yapar. tercihin bu cihazda saklanır.
           </p>
@@ -53,7 +53,7 @@ export default async function SettingsPage() {
                 title="profil fotoğrafın kaldırılsın mı?"
                 description="fotoğraf silinir, yerine adının baş harfi görünür."
                 confirmLabel="kaldır"
-                className="h-10 rounded-lg border border-danger px-3 text-sm font-semibold text-danger hover:bg-page"
+                className="h-10 rounded-md border border-line px-3 text-sm text-danger hover:bg-surface-2"
               />
             )}
           </div>
@@ -72,9 +72,9 @@ export default async function SettingsPage() {
             type="submit"
             role="switch"
             aria-checked={viewer.allow_messages}
-            className={`h-11 rounded-lg px-4 text-sm font-bold ${
+            className={`h-10 rounded-md px-4 text-sm font-semibold ${
               viewer.allow_messages
-                ? "border border-line text-ink hover:bg-page"
+                ? "border border-line text-ink hover:bg-surface-2"
                 : "bg-gold text-on-gold hover:brightness-95"
             }`}
           >
@@ -87,9 +87,12 @@ export default async function SettingsPage() {
         {blocks.length === 0 ? (
           <p className="text-sm text-muted">kimseyi engellemedin.</p>
         ) : (
-          <ul className="divide-y divide-line">
+          <ul>
             {blocks.map((block) => (
-              <li key={block.blocked_id} className="flex items-center justify-between gap-3 py-2">
+              <li
+                key={block.blocked_id}
+                className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-b-0"
+              >
                 {block.blocked ? (
                   <Link
                     href={`/yazar/${encodeURIComponent(block.blocked.username)}`}
@@ -104,7 +107,7 @@ export default async function SettingsPage() {
                 <form action={unblockUser.bind(null, block.blocked_id)}>
                   <button
                     type="submit"
-                    className="h-10 shrink-0 rounded-lg border border-line px-3 text-sm font-semibold hover:bg-page"
+                    className="h-10 shrink-0 rounded-md border border-line px-3 text-sm hover:bg-surface-2"
                   >
                     engeli kaldır
                   </button>
@@ -120,8 +123,8 @@ export default async function SettingsPage() {
 
 function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
-      <h2 className="mb-2 text-sm font-bold">{title}</h2>
+    <div className="border-b border-line py-5">
+      <h2 className="mb-2 text-sm font-semibold">{title}</h2>
       {children}
     </div>
   );
