@@ -3,10 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import Avatar from "@/components/Avatar";
+import ConfirmButton from "@/components/ConfirmButton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
-import { setAllowMessages, unblockUser } from "./actions";
+import { removeAvatar, setAllowMessages, unblockUser } from "./actions";
 import AvatarForm from "./AvatarForm";
 
 export const metadata: Metadata = { title: "ayarlar" };
@@ -23,9 +24,7 @@ export default async function SettingsPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("blocks")
-    .select(
-      "blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)",
-    )
+    .select("blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)")
     .eq("blocker_id", viewer.id)
     .order("created_at", { ascending: false });
   const blocks = (data ?? []) as unknown as BlockRow[];
@@ -38,19 +37,26 @@ export default async function SettingsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <ThemeToggle className="grid size-11 place-items-center rounded-lg border border-line hover:bg-page" />
           <p className="text-sm text-muted">
-            açık ve karanlık mod arasında geçiş yapar. tercihin bu cihazda
-            saklanır.
+            açık ve karanlık mod arasında geçiş yapar. tercihin bu cihazda saklanır.
           </p>
         </div>
       </SettingsSection>
 
-      <SettingsSection title="avatar">
+      <SettingsSection title="profil fotoğrafı">
         <div className="flex flex-wrap items-start gap-4">
-          <Avatar
-            username={viewer.username}
-            url={viewer.avatar_url}
-            size="lg"
-          />
+          <div className="space-y-2">
+            <Avatar username={viewer.username} url={viewer.avatar_url} size="lg" />
+            {viewer.avatar_url && (
+              <ConfirmButton
+                action={removeAvatar}
+                label="fotoğrafı kaldır"
+                title="profil fotoğrafın kaldırılsın mı?"
+                description="fotoğraf silinir, yerine adının baş harfi görünür."
+                confirmLabel="kaldır"
+                className="h-10 rounded-lg border border-danger px-3 text-sm font-semibold text-danger hover:bg-page"
+              />
+            )}
+          </div>
           <AvatarForm />
         </div>
       </SettingsSection>
@@ -61,10 +67,7 @@ export default async function SettingsPage() {
             ? "özel mesajların açık, yazarlar sana mesaj atabilir."
             : "özel mesajların kapalı, kimse sana yeni mesaj atamaz. eski mesajlarını okumaya devam edebilirsin."}
         </p>
-        <form
-          action={setAllowMessages.bind(null, !viewer.allow_messages)}
-          className="mt-3"
-        >
+        <form action={setAllowMessages.bind(null, !viewer.allow_messages)} className="mt-3">
           <button
             type="submit"
             role="switch"
@@ -75,9 +78,7 @@ export default async function SettingsPage() {
                 : "bg-gold text-on-gold hover:brightness-95"
             }`}
           >
-            {viewer.allow_messages
-              ? "özel mesajları kapat"
-              : "özel mesajları aç"}
+            {viewer.allow_messages ? "özel mesajları kapat" : "özel mesajları aç"}
           </button>
         </form>
       </SettingsSection>
@@ -88,22 +89,14 @@ export default async function SettingsPage() {
         ) : (
           <ul className="divide-y divide-line">
             {blocks.map((block) => (
-              <li
-                key={block.blocked_id}
-                className="flex items-center justify-between gap-3 py-2"
-              >
+              <li key={block.blocked_id} className="flex items-center justify-between gap-3 py-2">
                 {block.blocked ? (
                   <Link
                     href={`/yazar/${encodeURIComponent(block.blocked.username)}`}
                     className="inline-flex min-w-0 items-center gap-2 font-semibold text-gold-ink hover:underline"
                   >
-                    <Avatar
-                      username={block.blocked.username}
-                      url={block.blocked.avatar_url}
-                    />
-                    <span className="break-words">
-                      {block.blocked.username}
-                    </span>
+                    <Avatar username={block.blocked.username} url={block.blocked.avatar_url} />
+                    <span className="break-words">{block.blocked.username}</span>
                   </Link>
                 ) : (
                   <span className="text-muted">silinmiş hesap</span>
@@ -125,13 +118,7 @@ export default async function SettingsPage() {
   );
 }
 
-function SettingsSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
       <h2 className="mb-2 text-sm font-bold">{title}</h2>

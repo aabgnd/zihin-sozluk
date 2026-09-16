@@ -12,7 +12,7 @@ const AVATAR_EXTENSIONS: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
-const MAX_AVATAR_BYTES = 1024 * 1024;
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 async function requireViewer() {
   const viewer = await getViewer();
@@ -20,47 +20,64 @@ async function requireViewer() {
   return viewer;
 }
 
-export async function updateAvatar(
-  _prev: FormState,
-  formData: FormData,
-): Promise<FormState> {
+export async function updateAvatar(_prev: FormState, formData: FormData): Promise<FormState> {
   const viewer = await requireViewer();
   const file = formData.get("avatar");
-  if (!(file instanceof File) || file.size === 0)
-    return { error: "bir görsel seç." };
+  if (!(file instanceof File) || file.size === 0) return { error: "bir görsel seç." };
 
   const extension = AVATAR_EXTENSIONS[file.type];
-  if (!extension)
-    return { error: "sadece jpg, png ya da webp yükleyebilirsin." };
-  if (file.size > MAX_AVATAR_BYTES)
-    return { error: "görsel en fazla 1 mb olabilir." };
+  if (!extension) return { error: "sadece jpg, png ya da webp yükleyebilirsin." };
+  if (file.size > MAX_AVATAR_BYTES) {
+    const sizeInMb = (file.size / 1024 / 1024).toFixed(1);
+    return { error: `görsel en fazla 2 mb olabilir. seçtiğin dosya ${sizeInMb} mb.` };
+  }
 
   const supabase = await createClient();
   const bucket = supabase.storage.from("avatars");
+  const path = `${viewer.id}/avatar.${extension}`;
 
-  const { data: oldFiles } = await bucket.list(viewer.id);
-  const path = `${viewer.id}/avatar-${Date.now()}.${extension}`;
+  // Sabit dosya adına üzerine yazılır: eski adres hiçbir an boşa düşmez.
   const { error: uploadError } = await bucket.upload(path, file, {
     contentType: file.type,
     cacheControl: "31536000",
+    upsert: true,
   });
   if (uploadError) return { error: "görsel yüklenemedi, tekrar dene." };
 
+  // Sürüm parametresi olmadan tarayıcı ve görsel önbelleği eski fotoğrafı göstermeye devam eder.
+  const publicUrl = `${bucket.getPublicUrl(path).data.publicUrl}?v=${Date.now()}`;
   const { error } = await supabase
     .from("profiles")
-    .update({ avatar_url: bucket.getPublicUrl(path).data.publicUrl })
+    .update({ avatar_url: publicUrl })
     .eq("id", viewer.id);
   if (error) return { error: "avatar kaydedilemedi, tekrar dene." };
 
-  if (oldFiles && oldFiles.length > 0) {
-    await bucket.remove(
-      oldFiles.map((oldFile) => `${viewer.id}/${oldFile.name}`),
-    );
-  }
+  // Yeni adres kaydedildikten sonra eski dosyalar temizlenir.
+  const { data: files } = await bucket.list(viewer.id);
+  const stale = (files ?? [])
+    .map((oldFile) => `${viewer.id}/${oldFile.name}`)
+    .filter((oldPath) => oldPath !== path);
+  if (stale.length > 0) await bucket.remove(stale);
 
   await syncOtherDevices(viewer.id);
   revalidatePath("/", "layout");
   return { message: "avatarın güncellendi." };
+}
+
+export async function removeAvatar() {
+  const viewer = await requireViewer();
+  const supabase = await createClient();
+  const bucket = supabase.storage.from("avatars");
+
+  await supabase.from("profiles").update({ avatar_url: null }).eq("id", viewer.id);
+
+  const { data: files } = await bucket.list(viewer.id);
+  if (files && files.length > 0) {
+    await bucket.remove(files.map((oldFile) => `${viewer.id}/${oldFile.name}`));
+  }
+
+  await syncOtherDevices(viewer.id);
+  revalidatePath("/", "layout");
 }
 
 export async function setAllowMessages(allow: boolean) {
@@ -79,9 +96,7 @@ export async function blockUser(targetId: string) {
   if (targetId === viewer.id) return;
 
   const supabase = await createClient();
-  await supabase
-    .from("blocks")
-    .insert({ blocker_id: viewer.id, blocked_id: targetId });
+  await supabase.from("blocks").insert({ blocker_id: viewer.id, blocked_id: targetId });
   await syncOtherDevices(viewer.id);
   revalidatePath("/", "layout");
 }
@@ -89,11 +104,7 @@ export async function blockUser(targetId: string) {
 export async function unblockUser(targetId: string) {
   const viewer = await requireViewer();
   const supabase = await createClient();
-  await supabase
-    .from("blocks")
-    .delete()
-    .eq("blocker_id", viewer.id)
-    .eq("blocked_id", targetId);
+  await supabase.from("blocks").delete().eq("blocker_id", viewer.id).eq("blocked_id", targetId);
   await syncOtherDevices(viewer.id);
   revalidatePath("/", "layout");
 }
