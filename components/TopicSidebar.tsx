@@ -4,10 +4,7 @@ import type { TopEntry, TopicListItem } from "@/lib/types";
 import SidebarTabs from "./SidebarTabs";
 
 export default async function TopicSidebar() {
-  const [topics, topRated] = await Promise.all([
-    getAgendaTopics(),
-    getYesterdayTop(),
-  ]);
+  const [topics, topRated] = await Promise.all([getAgendaTopics(), getYesterdayTop()]);
 
   return (
     <SidebarTabs
@@ -19,23 +16,19 @@ export default async function TopicSidebar() {
 
 function AgendaList({ topics }: { topics: TopicListItem[] }) {
   if (topics.length === 0) {
-    return <p className="px-1 py-2 text-sm text-muted">henüz başlık yok.</p>;
+    return <p className="py-2 text-sm text-muted">henüz başlık yok.</p>;
   }
 
   return (
-    <ul className="space-y-0.5">
+    <ul>
       {topics.map((topic) => (
         <li key={topic.slug}>
           <Link
             href={`/baslik/${topic.slug}`}
-            className="flex items-start justify-between gap-2 rounded-lg px-2 py-2 text-sm leading-snug hover:bg-page"
+            className="flex items-start justify-between gap-3 rounded-md px-2 py-2.5 text-sm leading-snug text-ink hover:bg-surface-2"
           >
             <span className="break-words">{topic.title}</span>
-            {(topic.today_count ?? 0) > 0 && (
-              <span className="shrink-0 text-xs text-muted">
-                {topic.today_count}
-              </span>
-            )}
+            <span className="shrink-0 pt-0.5 text-xs text-muted">{topic.entry_count}</span>
           </Link>
         </li>
       ))}
@@ -45,26 +38,20 @@ function AgendaList({ topics }: { topics: TopicListItem[] }) {
 
 function TopRatedList({ entries }: { entries: TopEntry[] }) {
   if (entries.length === 0) {
-    return (
-      <p className="px-1 py-2 text-sm text-muted">dün beğenilen entry yok.</p>
-    );
+    return <p className="py-2 text-sm text-muted">dün beğenilen entry yok.</p>;
   }
 
   return (
-    <ul className="space-y-0.5">
+    <ul>
       {entries.map((entry) => (
         <li key={entry.entry_id}>
           <Link
             href={`/baslik/${entry.topic_slug}#entry-${entry.entry_id}`}
-            className="block rounded-lg px-2 py-2 hover:bg-page"
+            className="block rounded-md px-2 py-2.5 hover:bg-surface-2"
           >
-            <span className="flex items-baseline justify-between gap-2">
-              <span className="break-words text-sm font-semibold">
-                {entry.topic_title}
-              </span>
-              <span className="shrink-0 text-xs font-semibold text-gold-ink">
-                +{entry.upvotes}
-              </span>
+            <span className="flex items-baseline justify-between gap-3">
+              <span className="break-words text-sm">{entry.topic_title}</span>
+              <span className="shrink-0 text-xs text-gold-ink">+{entry.upvotes}</span>
             </span>
             <span className="mt-0.5 line-clamp-2 block break-words text-xs text-muted">
               {entry.snippet}

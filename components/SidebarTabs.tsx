@@ -12,17 +12,15 @@ export default function SidebarTabs({
   const [tab, setTab] = useState<"gundem" | "dun">("gundem");
 
   const tabClass = (active: boolean) =>
-    `flex h-9 items-center rounded-lg px-2.5 text-xs font-bold ${
-      active ? "bg-gold text-on-gold" : "text-muted hover:text-ink"
+    `flex h-9 items-center border-b-2 pb-1 text-sm transition-colors ${
+      active
+        ? "border-gold font-semibold text-ink"
+        : "border-transparent text-muted hover:text-ink"
     }`;
 
   return (
-    <div className="rounded-xl border border-line bg-surface p-3 shadow-sm">
-      <div
-        role="tablist"
-        aria-label="gündem sekmeleri"
-        className="mb-2 flex flex-wrap gap-1"
-      >
+    <nav aria-label="gündem">
+      <div role="tablist" aria-label="gündem sekmeleri" className="mb-2 flex gap-4">
         <button
           type="button"
           role="tab"
@@ -43,6 +41,6 @@ export default function SidebarTabs({
         </button>
       </div>
       {tab === "gundem" ? agenda : topRated}
-    </div>
+    </nav>
   );
 }

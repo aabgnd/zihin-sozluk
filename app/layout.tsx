@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
+import Script from "next/script";
 import RightRail from "@/components/RightRail";
+import ScrollTopButton from "@/components/ScrollTopButton";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import TopicSidebar from "@/components/TopicSidebar";
@@ -21,30 +23,35 @@ const themeScript = `try{var t=localStorage.getItem("tema");var d=t?t==="koyu":m
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="tr"
-      className={`${sourceSans.variable} antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="tr" className={`${sourceSans.variable} antialiased`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Script
+          id="tema"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
       </head>
       <body className="flex min-h-dvh flex-col bg-page font-sans text-ink">
         <SiteHeader />
-        <div className="mx-auto grid w-full max-w-7xl flex-1 gap-4 px-3 py-4 md:grid-cols-[250px_minmax(0,1fr)] md:px-5 lg:grid-cols-[250px_minmax(0,1fr)_300px] lg:gap-6">
-          <aside className="hidden md:block">
-            <div className="sticky top-4">
+
+        <div className="mx-auto grid w-full max-w-[1200px] flex-1 gap-8 px-4 py-6 md:grid-cols-[minmax(0,1fr)_280px] lg:grid-cols-[250px_minmax(0,1fr)_280px]">
+          <aside className="hidden lg:block">
+            <div className="ince-kaydirma sticky top-6 max-h-[calc(100dvh-3rem)] overflow-y-auto pr-2">
               <TopicSidebar />
             </div>
           </aside>
+
           <main className="min-w-0">{children}</main>
-          <aside className="hidden lg:block">
-            <div className="sticky top-4">
+
+          <aside className="hidden md:block">
+            <div className="sticky top-6">
               <RightRail />
             </div>
           </aside>
         </div>
+
         <SiteFooter />
+        <ScrollTopButton />
       </body>
     </html>
   );

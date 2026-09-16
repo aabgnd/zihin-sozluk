@@ -5,10 +5,12 @@ import { formatDateTime } from "@/lib/text";
 import type { EntryRow } from "@/lib/types";
 import Avatar from "./Avatar";
 import ConfirmButton from "./ConfirmButton";
+import EntryMenu from "./EntryMenu";
 import EntryText from "./EntryText";
-import { ChevronDownIcon, ChevronUpIcon, HeartIcon } from "./icons";
+import ExpandableText from "./ExpandableText";
+import { ChevronDownIcon, ChevronUpIcon, HeartIcon, ShareIcon } from "./icons";
+import RankBadge from "./RankBadge";
 import ReportButton from "./ReportButton";
-import TitleBadge from "./TitleBadge";
 
 type Props = {
   entry: EntryRow;
@@ -17,10 +19,12 @@ type Props = {
   myVote?: number;
   favorited?: boolean;
   showTopic?: boolean;
+  authorEntryCount?: number | null;
 };
 
-const actionButton =
-  "inline-flex h-9 min-w-9 items-center justify-center gap-1 rounded-lg px-2 text-muted hover:bg-page hover:text-ink";
+const groupButton =
+  "inline-flex h-9 items-center gap-1 px-2.5 text-sm text-muted hover:bg-surface-2 hover:text-ink";
+const entryMenuItem = "flex h-11 w-full items-center px-4 text-left text-sm hover:bg-surface-2";
 
 export default function EntryCard({
   entry,
@@ -29,44 +33,40 @@ export default function EntryCard({
   myVote = 0,
   favorited = false,
   showTopic = false,
+  authorEntryCount = null,
 }: Props) {
   const favoriteCount = entry.favorites[0]?.count ?? 0;
   const { author } = entry;
   const isOwnEntry = Boolean(viewerId && author && author.id === viewerId);
   const otherUsersEntry = Boolean(viewerId && author && author.id !== viewerId);
+  const entryHref = entry.topic ? `/baslik/${entry.topic.slug}#entry-${entry.id}` : "";
 
   return (
-    <article
-      id={`entry-${entry.id}`}
-      className="scroll-mt-4 rounded-xl border border-line bg-surface p-4 shadow-sm"
-    >
+    <article id={`entry-${entry.id}`} className="scroll-mt-6 border-b border-line py-6">
       {showTopic && entry.topic && (
         <h3 className="mb-2 text-base font-bold">
-          <Link
-            href={`/baslik/${entry.topic.slug}`}
-            className="hover:text-gold-ink"
-          >
+          <Link href={`/baslik/${entry.topic.slug}`} className="text-gold-ink hover:opacity-80">
             {entry.topic.title}
           </Link>
         </h3>
       )}
 
-      <EntryText content={entry.content} />
+      <ExpandableText>
+        <EntryText content={entry.content} />
+      </ExpandableText>
 
       {entry.edited_at && (
-        <p className="mt-1 text-xs text-muted">
-          düzenlendi: {formatDateTime(entry.edited_at)}
-        </p>
+        <p className="mt-1 text-xs text-muted">düzenlendi: {formatDateTime(entry.edited_at)}</p>
       )}
 
-      <footer className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs">
-        <div className="-ml-2 flex flex-wrap items-center">
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="inline-flex divide-x divide-line overflow-hidden rounded-md border border-line">
           <form action={vote.bind(null, entry.id, 1)}>
             <button
               type="submit"
               aria-label="artı oy"
               aria-pressed={myVote === 1}
-              className={`${actionButton} ${myVote === 1 ? "text-gold-ink" : ""}`}
+              className={`${groupButton} ${myVote === 1 ? "text-gold-ink" : ""}`}
             >
               <ChevronUpIcon className="size-4" />
               {entry.upvotes}
@@ -77,7 +77,7 @@ export default function EntryCard({
               type="submit"
               aria-label="eksi oy"
               aria-pressed={myVote === -1}
-              className={`${actionButton} ${myVote === -1 ? "text-gold-ink" : ""}`}
+              className={`${groupButton} ${myVote === -1 ? "text-gold-ink" : ""}`}
             >
               <ChevronDownIcon className="size-4" />
             </button>
@@ -87,95 +87,88 @@ export default function EntryCard({
               type="submit"
               aria-label={favorited ? "favorilerden çıkar" : "favorile"}
               aria-pressed={favorited}
-              className={`${actionButton} ${favorited ? "text-gold-ink" : ""}`}
+              className={`${groupButton} ${favorited ? "text-gold-ink" : ""}`}
             >
               <HeartIcon filled={favorited} className="size-4" />
               {favoriteCount > 0 && favoriteCount}
             </button>
           </form>
-
-          {isOwnEntry && entry.topic && (
-            <>
-              <Link
-                href={`/baslik/${entry.topic.slug}?duzenle=${entry.id}`}
-                className={`${actionButton} font-semibold`}
-              >
-                düzenle
-              </Link>
-              <ConfirmButton
-                action={deleteEntry.bind(null, entry.id)}
-                label="sil"
-                title="bu entry silinsin mi?"
-                description="bu işlem geri alınamaz."
-                className={`${actionButton} font-semibold`}
-              />
-            </>
-          )}
-
-          {otherUsersEntry && (
-            <ReportButton entryId={entry.id} className={actionButton} />
-          )}
-
-          {isStaff && !isOwnEntry && (
-            <ConfirmButton
-              action={modDeleteEntry.bind(null, entry.id)}
-              label="moderasyon sil"
-              title="bu entry moderasyon tarafından silinsin mi?"
-              description="entry çöp kutusuna taşınır, geri yüklenebilir."
-              className={`${actionButton} font-semibold text-danger`}
-            />
-          )}
-
-          {otherUsersEntry &&
-            author &&
-            (author.allow_messages ? (
-              <Link
-                href={`/mesajlar/${encodeURIComponent(author.username)}`}
-                className={`${actionButton} font-semibold`}
-              >
-                mesaj at
-              </Link>
-            ) : (
-              <span className="px-2 text-[11px] text-muted">
-                bu yazar özel mesajlarını kapattı
-              </span>
-            ))}
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted sm:flex-col sm:items-end sm:gap-0.5">
-            <time dateTime={entry.created_at} className="sm:order-last">
-              {formatDateTime(entry.created_at)}
-            </time>
-            {author && (
+        <div className="flex items-center gap-1">
+          {entryHref && (
+            <Link
+              href={entryHref}
+              aria-label="entry bağlantısı"
+              className="grid size-9 place-items-center rounded-md text-muted hover:bg-surface-2 hover:text-ink"
+            >
+              <ShareIcon className="size-4" />
+            </Link>
+          )}
+
+          <EntryMenu entryHref={entryHref}>
+            {otherUsersEntry && <ReportButton entryId={entry.id} className={entryMenuItem} />}
+            {isOwnEntry && entry.topic && (
               <>
                 <Link
-                  href={`/yazar/${encodeURIComponent(author.username)}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold-ink hover:underline"
+                  href={`/baslik/${entry.topic.slug}?duzenle=${entry.id}`}
+                  role="menuitem"
+                  className={entryMenuItem}
                 >
-                  <span className="sm:hidden">
-                    <Avatar username={author.username} url={author.avatar_url} />
-                  </span>
-                  {author.username}
+                  düzenle
                 </Link>
-                <TitleBadge
-                  generation={author.generation}
-                  title={author.title}
+                <ConfirmButton
+                  action={deleteEntry.bind(null, entry.id)}
+                  label="sil"
+                  title="bu entry silinsin mi?"
+                  description="bu işlem geri alınamaz."
+                  className={entryMenuItem}
                 />
               </>
             )}
-          </div>
-          {author && (
-            <span className="hidden sm:block">
-              <Avatar
-                username={author.username}
-                url={author.avatar_url}
-                size="md"
+            {isStaff && !isOwnEntry && (
+              <ConfirmButton
+                action={modDeleteEntry.bind(null, entry.id)}
+                label="moderasyon sil"
+                title="bu entry moderasyon tarafından silinsin mi?"
+                description="entry çöp kutusuna taşınır, geri yüklenebilir."
+                className={`${entryMenuItem} text-danger`}
               />
-            </span>
-          )}
+            )}
+            {otherUsersEntry && author?.allow_messages && (
+              <Link
+                href={`/mesajlar/${encodeURIComponent(author.username)}`}
+                role="menuitem"
+                className={entryMenuItem}
+              >
+                mesaj at
+              </Link>
+            )}
+          </EntryMenu>
         </div>
-      </footer>
+      </div>
+
+      {author && (
+        <div className="mt-3 flex items-center justify-end gap-2.5">
+          <div className="min-w-0 text-right">
+            <div className="flex flex-wrap items-center justify-end gap-1.5">
+              <Link
+                href={`/yazar/${encodeURIComponent(author.username)}`}
+                className="text-sm font-semibold text-gold-ink hover:underline"
+              >
+                {author.username}
+              </Link>
+              {authorEntryCount !== null && <RankBadge entryCount={authorEntryCount} />}
+            </div>
+            <time dateTime={entry.created_at} className="mt-0.5 block text-xs text-muted">
+              {formatDateTime(entry.created_at)}
+            </time>
+          </div>
+          <Link href={`/yazar/${encodeURIComponent(author.username)}`} aria-hidden="true" tabIndex={-1}>
+            <Avatar username={author.username} url={author.avatar_url} size="md" />
+          </Link>
+        </div>
+      )}
     </article>
   );
 }
