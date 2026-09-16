@@ -57,9 +57,18 @@ export default async function SiteHeader() {
       <div className="h-1 bg-gold" />
 
       <div className="relative border-b border-line">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4">
+        <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-1.5 px-4 sm:gap-3">
+          {/* Telefonda header kalabalık olmasın: bilgi ve tema çekmecenin içinde. */}
           <div className="lg:hidden">
-            <MobileAgendaDrawer buttonClassName={iconButton}>
+            <MobileAgendaDrawer
+              buttonClassName={iconButton}
+              footer={
+                <>
+                  <InfoModal className={iconButton} />
+                  <ThemeToggle className={iconButton} />
+                </>
+              }
+            >
               <TopicSidebar />
             </MobileAgendaDrawer>
           </div>
@@ -82,8 +91,12 @@ export default async function SiteHeader() {
             <div className="md:hidden">
               <MobileSearch buttonClassName={iconButton} />
             </div>
-            <InfoModal className={iconButton} />
-            <ThemeToggle className={iconButton} />
+            <div className="hidden lg:block">
+              <InfoModal className={iconButton} />
+            </div>
+            <div className="hidden lg:block">
+              <ThemeToggle className={iconButton} />
+            </div>
 
             {viewer ? (
               <AccountNav
