@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { deleteEntry, toggleFavorite, vote } from "@/app/baslik/actions";
 import { modDeleteEntry } from "@/app/yonetim/actions";
-import { formatDateTime } from "@/lib/text";
+import LocalTime from "./LocalTime";
 import type { EntryRow } from "@/lib/types";
 import Avatar from "./Avatar";
 import ConfirmButton from "./ConfirmButton";
@@ -24,7 +24,8 @@ type Props = {
 
 const groupButton =
   "inline-flex h-9 items-center gap-1 px-2.5 text-sm text-muted hover:bg-surface-2 hover:text-ink";
-const entryMenuItem = "flex h-11 w-full items-center px-4 text-left text-sm hover:bg-surface-2";
+const entryMenuItem =
+  "flex h-11 w-full items-center px-4 text-left text-sm hover:bg-surface-2";
 
 export default function EntryCard({
   entry,
@@ -39,13 +40,21 @@ export default function EntryCard({
   const { author } = entry;
   const isOwnEntry = Boolean(viewerId && author && author.id === viewerId);
   const otherUsersEntry = Boolean(viewerId && author && author.id !== viewerId);
-  const entryHref = entry.topic ? `/baslik/${entry.topic.slug}#entry-${entry.id}` : "";
+  const entryHref = entry.topic
+    ? `/baslik/${entry.topic.slug}#entry-${entry.id}`
+    : "";
 
   return (
-    <article id={`entry-${entry.id}`} className="scroll-mt-6 border-b border-line py-6">
+    <article
+      id={`entry-${entry.id}`}
+      className="scroll-mt-6 border-b border-line py-6"
+    >
       {showTopic && entry.topic && (
         <h3 className="mb-2 text-base font-bold">
-          <Link href={`/baslik/${entry.topic.slug}`} className="text-gold-ink hover:opacity-80">
+          <Link
+            href={`/baslik/${entry.topic.slug}`}
+            className="text-gold-ink hover:opacity-80"
+          >
             {entry.topic.title}
           </Link>
         </h3>
@@ -56,7 +65,9 @@ export default function EntryCard({
       </ExpandableText>
 
       {entry.edited_at && (
-        <p className="mt-1 text-xs text-muted">düzenlendi: {formatDateTime(entry.edited_at)}</p>
+        <p className="mt-1 text-xs text-muted">
+          düzenlendi: <LocalTime iso={entry.edited_at} />
+        </p>
       )}
 
       <div className="mt-3 flex items-center justify-between gap-3">
@@ -107,7 +118,9 @@ export default function EntryCard({
           )}
 
           <EntryMenu entryHref={entryHref}>
-            {otherUsersEntry && <ReportButton entryId={entry.id} className={entryMenuItem} />}
+            {otherUsersEntry && (
+              <ReportButton entryId={entry.id} className={entryMenuItem} />
+            )}
             {isOwnEntry && entry.topic && (
               <>
                 <Link
@@ -158,14 +171,25 @@ export default function EntryCard({
               >
                 {author.username}
               </Link>
-              {authorEntryCount !== null && <RankBadge entryCount={authorEntryCount} />}
+              {authorEntryCount !== null && (
+                <RankBadge entryCount={authorEntryCount} />
+              )}
             </div>
-            <time dateTime={entry.created_at} className="mt-0.5 block text-xs text-muted">
-              {formatDateTime(entry.created_at)}
-            </time>
+            <LocalTime
+              iso={entry.created_at}
+              className="mt-0.5 block text-xs text-muted"
+            />
           </div>
-          <Link href={`/yazar/${encodeURIComponent(author.username)}`} aria-hidden="true" tabIndex={-1}>
-            <Avatar username={author.username} url={author.avatar_url} size="md" />
+          <Link
+            href={`/yazar/${encodeURIComponent(author.username)}`}
+            aria-hidden="true"
+            tabIndex={-1}
+          >
+            <Avatar
+              username={author.username}
+              url={author.avatar_url}
+              size="md"
+            />
           </Link>
         </div>
       )}

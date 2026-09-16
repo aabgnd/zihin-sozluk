@@ -26,37 +26,64 @@ export function slugify(input: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-const dateTimeFormat = new Intl.DateTimeFormat("tr-TR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  timeZone: "Europe/Istanbul",
-});
+/*
+ * Tüm tarih/saat gösterimi buradan geçer. Biçim: 16.09.2026 13:30
+ *
+ * Saatler veritabanında UTC durur. "site" saat dilimi yalnızca sunucuda
+ * boyanan ilk hâl içindir; kullanıcının gördüğü saat LocalTime bileşeni
+ * aracılığıyla kendi cihazının saat dilimine göre yazılır.
+ */
+export type StampMode = "datetime" | "date";
 
-const dateFormat = new Intl.DateTimeFormat("tr-TR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "Europe/Istanbul",
-});
+const SITE_TIMEZONE = "Europe/Istanbul";
+
+function buildFormat(mode: StampMode, timeZone: string | undefined) {
+  return new Intl.DateTimeFormat("tr-TR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    ...(mode === "datetime"
+      ? { hour: "2-digit" as const, minute: "2-digit" as const }
+      : {}),
+    ...(timeZone ? { timeZone } : {}),
+  });
+}
+
+const FORMATS = {
+  "datetime:site": buildFormat("datetime", SITE_TIMEZONE),
+  "date:site": buildFormat("date", SITE_TIMEZONE),
+  "datetime:device": buildFormat("datetime", undefined),
+  "date:device": buildFormat("date", undefined),
+};
+
+export function formatStamp(
+  iso: string,
+  mode: StampMode = "datetime",
+  zone: "site" | "device" = "site",
+) {
+  return FORMATS[`${mode}:${zone}`].format(new Date(iso));
+}
 
 const isoDayFormat = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "Europe/Istanbul",
+  timeZone: SITE_TIMEZONE,
 });
 
+/** Metin içine gömülen saatler (mail, uyarı cümlesi) için site saati. */
 export function formatDateTime(iso: string) {
-  return dateTimeFormat.format(new Date(iso));
+  return formatStamp(iso, "datetime");
 }
 
 export function formatDate(iso: string) {
-  return dateFormat.format(new Date(iso));
+  return formatStamp(iso, "date");
 }
 
 export function istanbulDay(offsetDays: number) {
   const date = new Date(Date.now() + offsetDays * 86_400_000);
-  return { iso: isoDayFormat.format(date), label: dateFormat.format(date) };
+  // Gündem günü site saatine göre belirlenir, cihaza göre değil.
+  return {
+    iso: isoDayFormat.format(date),
+    label: formatStamp(date.toISOString(), "date"),
+  };
 }
 
 export function firstParam(value: string | string[] | undefined) {

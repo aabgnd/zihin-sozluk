@@ -3,9 +3,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import LiveRefresh from "@/components/LiveRefresh";
+import LocalTime from "@/components/LocalTime";
 import MarkRead from "@/components/MarkRead";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime } from "@/lib/text";
 import { getViewer } from "@/lib/viewer";
 import { markNotificationsRead } from "./actions";
 
@@ -41,7 +41,9 @@ const NOTIFICATION_SELECT =
 
 function describe(notification: NotificationRow, viewerUsername: string) {
   const entry = notification.entry;
-  const entryHref = entry?.topic ? `/baslik/${entry.topic.slug}#entry-${entry.id}` : null;
+  const entryHref = entry?.topic
+    ? `/baslik/${entry.topic.slug}#entry-${entry.id}`
+    : null;
   const topicHref = entry?.topic ? `/baslik/${entry.topic.slug}` : null;
   const myProfile = `/yazar/${encodeURIComponent(viewerUsername)}`;
 
@@ -67,11 +69,17 @@ function describe(notification: NotificationRow, viewerUsername: string) {
           : null,
       };
     case "yazarlik":
-      return { text: "seni yazarlığa yükseltti. artık yeni başlık açabilirsin.", href: myProfile };
+      return {
+        text: "seni yazarlığa yükseltti. artık yeni başlık açabilirsin.",
+        href: myProfile,
+      };
     case "rozet":
       return { text: "yeni bir rozet kazandın.", href: myProfile };
     case "entry_silindi":
-      return { text: "entry'ni kurallara aykırı bulup sildi.", href: topicHref };
+      return {
+        text: "entry'ni kurallara aykırı bulup sildi.",
+        href: topicHref,
+      };
     case "susturma":
       return { text: "seni susturdu.", href: null };
   }
@@ -96,17 +104,25 @@ export default async function NotificationsPage() {
       !notification.entry ||
       notification.entry.deleted_at === null,
   );
-  const newestUnread = notifications.find((notification) => !notification.is_read);
+  const newestUnread = notifications.find(
+    (notification) => !notification.is_read,
+  );
 
   return (
     <section>
       <LiveRefresh
         channel={`bildirim-kutusu:${viewer.id}`}
-        subscriptions={[{ table: "notifications", filter: `user_id=eq.${viewer.id}` }]}
+        subscriptions={[
+          { table: "notifications", filter: `user_id=eq.${viewer.id}` },
+        ]}
       />
-      {newestUnread && <MarkRead key={newestUnread.id} action={markNotificationsRead} />}
+      {newestUnread && (
+        <MarkRead key={newestUnread.id} action={markNotificationsRead} />
+      )}
 
-      <h1 className="border-b border-line pb-3 text-2xl font-bold">bildirimler</h1>
+      <h1 className="border-b border-line pb-3 text-2xl font-bold">
+        bildirimler
+      </h1>
 
       {notifications.length === 0 ? (
         <p className="py-4 leading-relaxed text-muted">
@@ -128,7 +144,10 @@ export default async function NotificationsPage() {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-[15px] leading-snug">
-                    <span className="font-semibold text-gold-ink">{actorName}</span> {text}
+                    <span className="font-semibold text-gold-ink">
+                      {actorName}
+                    </span>{" "}
+                    {text}
                     {!notification.is_read && (
                       <span className="ml-2 rounded-full bg-alert px-2 py-px text-[11px] font-bold text-on-alert">
                         yeni
@@ -138,17 +157,17 @@ export default async function NotificationsPage() {
                   {notification.entry && (
                     <p className="mt-0.5 line-clamp-2 break-words text-sm text-muted">
                       {notification.entry.topic && (
-                        <span className="font-semibold">{notification.entry.topic.title}: </span>
+                        <span className="font-semibold">
+                          {notification.entry.topic.title}:{" "}
+                        </span>
                       )}
                       {notification.entry.content}
                     </p>
                   )}
-                  <time
-                    dateTime={notification.created_at}
+                  <LocalTime
+                    iso={notification.created_at}
                     className="mt-0.5 block text-xs text-muted"
-                  >
-                    {formatDateTime(notification.created_at)}
-                  </time>
+                  />
                 </div>
               </>
             );
@@ -156,7 +175,10 @@ export default async function NotificationsPage() {
             return (
               <li key={notification.id} className="border-b border-line">
                 {href ? (
-                  <Link href={href} className="flex gap-3 rounded-md px-2 py-3 hover:bg-surface-2">
+                  <Link
+                    href={href}
+                    className="flex gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
+                  >
                     {body}
                   </Link>
                 ) : (
