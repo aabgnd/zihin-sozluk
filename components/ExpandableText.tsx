@@ -16,7 +16,8 @@ export default function ExpandableText({ children }: { children: ReactNode }) {
   useEffect(() => {
     const element = box.current;
     if (!element) return;
-    const collapsedPx = COLLAPSED_HEIGHT_EM * parseFloat(getComputedStyle(element).fontSize);
+    const collapsedPx =
+      COLLAPSED_HEIGHT_EM * parseFloat(getComputedStyle(element).fontSize);
     setNeedsToggle(element.scrollHeight > collapsedPx + 8);
   }, []);
 
@@ -26,7 +27,9 @@ export default function ExpandableText({ children }: { children: ReactNode }) {
         ref={box}
         className="overflow-hidden"
         style={
-          expanded || !needsToggle ? undefined : { maxHeight: `${COLLAPSED_HEIGHT_EM}em` }
+          expanded || !needsToggle
+            ? undefined
+            : { maxHeight: `${COLLAPSED_HEIGHT_EM}em` }
         }
       >
         {children}

@@ -19,7 +19,10 @@ import { getViewer } from "@/lib/viewer";
 
 const PAGE_SIZE = 10;
 
-export default async function TopicPage({ params, searchParams }: PageProps<"/baslik/[slug]">) {
+export default async function TopicPage({
+  params,
+  searchParams,
+}: PageProps<"/baslik/[slug]">) {
   const { slug } = await params;
   const query = await searchParams;
   const pageParam = firstParam(query.sayfa);
@@ -28,7 +31,11 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/ba
   const supabase = await createClient();
 
   const [{ data: topic }, viewer] = await Promise.all([
-    supabase.from("topics").select("id, title, slug").eq("slug", slug).maybeSingle(),
+    supabase
+      .from("topics")
+      .select("id, title, slug")
+      .eq("slug", slug)
+      .maybeSingle(),
     getViewer(),
   ]);
   if (!topic) notFound();
@@ -57,11 +64,17 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/ba
 
   const { data } =
     sort === "begeni"
-      ? await listQuery.order("upvotes", { ascending: false }).order("created_at")
+      ? await listQuery
+          .order("upvotes", { ascending: false })
+          .order("created_at")
       : await listQuery.order("created_at", { ascending: sort !== "yeni" });
 
   const entries = (data ?? []) as unknown as EntryRow[];
-  const authorIds = [...new Set(entries.flatMap((entry) => (entry.author ? [entry.author.id] : [])))];
+  const authorIds = [
+    ...new Set(
+      entries.flatMap((entry) => (entry.author ? [entry.author.id] : [])),
+    ),
+  ];
 
   const [{ votes, favorites }, countResult] = await Promise.all([
     getViewerEntryState(
@@ -74,10 +87,9 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/ba
   ]);
 
   const authorCounts = new Map(
-    ((countResult.data ?? []) as { user_id: string; entry_count: number }[]).map((row) => [
-      row.user_id,
-      row.entry_count,
-    ]),
+    (
+      (countResult.data ?? []) as { user_id: string; entry_count: number }[]
+    ).map((row) => [row.user_id, row.entry_count]),
   );
 
   const basePath = `/baslik/${topic.slug}`;
@@ -86,11 +98,15 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/ba
     <section>
       <LiveRefresh
         channel={`baslik:${topic.id}`}
-        subscriptions={[{ table: "entries", filter: `topic_id=eq.${topic.id}` }]}
+        subscriptions={[
+          { table: "entries", filter: `topic_id=eq.${topic.id}` },
+        ]}
       />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h1 className="break-words text-2xl font-bold leading-snug">{topic.title}</h1>
+        <h1 className="break-words text-2xl font-bold leading-snug">
+          {topic.title}
+        </h1>
         {viewer?.isStaff && (
           <ConfirmButton
             action={modDeleteTopic.bind(null, topic.id)}
@@ -135,7 +151,9 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/ba
             isStaff={viewer?.isStaff ?? false}
             myVote={votes.get(entry.id)}
             favorited={favorites.has(entry.id)}
-            authorEntryCount={entry.author ? (authorCounts.get(entry.author.id) ?? null) : null}
+            authorEntryCount={
+              entry.author ? (authorCounts.get(entry.author.id) ?? null) : null
+            }
           />
         ),
       )}
@@ -173,7 +191,10 @@ function EntryComposer({
     return (
       <p className="text-muted">
         entry yazmak için{" "}
-        <Link href="/giris" className="font-semibold text-gold-ink hover:underline">
+        <Link
+          href="/giris"
+          className="font-semibold text-gold-ink hover:underline"
+        >
           giriş yap
         </Link>
         .
@@ -190,13 +211,20 @@ function EntryComposer({
     );
   }
   if (viewer.is_frozen) {
-    return <p className="text-muted">hesabın dondurulduğu için şu an entry yazamazsın.</p>;
+    return (
+      <p className="text-muted">
+        hesabın dondurulduğu için şu an entry yazamazsın.
+      </p>
+    );
   }
 
   return (
     <div className="space-y-3">
       {!viewer.isWriter && (
-        <CaylakBox entryCount={viewer.reviewEntryCount} threshold={viewer.writerThreshold} />
+        <CaylakBox
+          entryCount={viewer.reviewEntryCount}
+          threshold={viewer.writerThreshold}
+        />
       )}
       <EntryEditor
         action={createEntry.bind(null, topicId, slug)}

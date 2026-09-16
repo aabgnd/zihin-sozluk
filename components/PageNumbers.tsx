@@ -24,9 +24,14 @@ export default function PageNumbers({
     <nav aria-label="sayfalar" className="flex flex-wrap items-center gap-1">
       {pages.map((candidate, index) => (
         <span key={candidate} className="flex items-center gap-1">
-          {index > 0 && candidate - pages[index - 1] > 1 && <span className="text-muted">…</span>}
+          {index > 0 && candidate - pages[index - 1] > 1 && (
+            <span className="text-muted">…</span>
+          )}
           {candidate === page ? (
-            <span aria-current="page" className={`${box} bg-gold font-semibold text-on-gold`}>
+            <span
+              aria-current="page"
+              className={`${box} bg-gold font-semibold text-on-gold`}
+            >
               {candidate}
             </span>
           ) : (

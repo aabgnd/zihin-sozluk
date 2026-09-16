@@ -6,7 +6,12 @@ import EntryEditor from "@/components/EntryEditor";
 import TopicList from "@/components/TopicList";
 import { isPermanentMute } from "@/lib/moderation";
 import { createClient } from "@/lib/supabase/server";
-import { firstParam, formatDateTime, normalizeTitle, slugify } from "@/lib/text";
+import {
+  firstParam,
+  formatDateTime,
+  normalizeTitle,
+  slugify,
+} from "@/lib/text";
 import type { TopicListItem, Viewer } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
@@ -59,7 +64,9 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
 
       {similar.length > 0 && (
         <section className="border-t border-line pt-5">
-          <h2 className="pb-2 text-sm font-semibold text-muted">benzer başlıklar</h2>
+          <h2 className="pb-2 text-sm font-semibold text-muted">
+            benzer başlıklar
+          </h2>
           <TopicList topics={similar} empty="" />
         </section>
       )}
@@ -80,7 +87,10 @@ function FirstEntry({
     return (
       <p className="text-muted">
         {"ilk entry'yi yazmak için "}
-        <Link href="/giris" className="font-semibold text-gold-ink hover:underline">
+        <Link
+          href="/giris"
+          className="font-semibold text-gold-ink hover:underline"
+        >
           giriş yap
         </Link>
         .
@@ -89,7 +99,9 @@ function FirstEntry({
   }
   if (!viewer.isWriter) {
     return (
-      <p className="text-muted">yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.</p>
+      <p className="text-muted">
+        yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.
+      </p>
     );
   }
   if (viewer.isMuted && viewer.mutedUntil) {
@@ -102,10 +114,16 @@ function FirstEntry({
     );
   }
   if (viewer.is_frozen) {
-    return <p className="text-muted">hesabın dondurulduğu için şu an entry yazamazsın.</p>;
+    return (
+      <p className="text-muted">
+        hesabın dondurulduğu için şu an entry yazamazsın.
+      </p>
+    );
   }
   if (!slug) {
-    return <p className="text-muted">başlıkta en az bir harf ya da rakam olmalı.</p>;
+    return (
+      <p className="text-muted">başlıkta en az bir harf ya da rakam olmalı.</p>
+    );
   }
   return (
     <EntryEditor

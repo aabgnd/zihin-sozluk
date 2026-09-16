@@ -7,11 +7,17 @@ import { RULES_TEXT, RULES_TITLE } from "@/lib/text";
 import type { FormState } from "@/lib/types";
 
 export default function SignupForm() {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(signUp, {});
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    signUp,
+    {},
+  );
 
   if (state.message) {
     return (
-      <p role="status" className="rounded-md border border-line px-4 py-3 leading-relaxed">
+      <p
+        role="status"
+        className="rounded-md border border-line px-4 py-3 leading-relaxed"
+      >
         {state.message}
       </p>
     );
@@ -27,7 +33,13 @@ export default function SignupForm() {
         maxLength={30}
         required
       />
-      <Field label="e-posta" name="email" type="email" autoComplete="email" required />
+      <Field
+        label="e-posta"
+        name="email"
+        type="email"
+        autoComplete="email"
+        required
+      />
       <Field
         label="şifre (en az 8 karakter)"
         name="password"
@@ -39,8 +51,17 @@ export default function SignupForm() {
       <div className="rounded-md border border-line p-3 text-sm">
         <p className="font-semibold">{RULES_TITLE}</p>
         <p className="mt-1 leading-relaxed text-muted">{RULES_TEXT}</p>
-        <label htmlFor="rules" className="mt-3 flex items-center gap-2 font-semibold">
-          <input id="rules" name="rules" type="checkbox" required className="size-4 accent-gold" />
+        <label
+          htmlFor="rules"
+          className="mt-3 flex items-center gap-2 font-semibold"
+        >
+          <input
+            id="rules"
+            name="rules"
+            type="checkbox"
+            required
+            className="size-4 accent-gold"
+          />
           okudum, kabul ediyorum
         </label>
       </div>

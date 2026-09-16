@@ -38,9 +38,13 @@ export default function ZihinOzet({
     summary?.top_entry_id && summary.top_entry_slug
       ? `/baslik/${summary.top_entry_slug}#entry-${summary.top_entry_id}`
       : null;
-  const showTopEntry = Boolean(topEntryHref && (summary?.top_entry_upvotes ?? 0) > 0);
+  const showTopEntry = Boolean(
+    topEntryHref && (summary?.top_entry_upvotes ?? 0) > 0,
+  );
   const showTopTopic = Boolean(
-    summary?.top_topic_title && summary.top_topic_slug && (summary.top_topic_count ?? 0) >= 2,
+    summary?.top_topic_title &&
+    summary.top_topic_slug &&
+    (summary.top_topic_count ?? 0) >= 2,
   );
   const snippet = kelimeSinirindaKes(summary?.top_entry_snippet ?? "");
 
@@ -77,14 +81,19 @@ export default function ZihinOzet({
 
           {showTopEntry && topEntryHref && (
             <div>
-              <p className="text-xs text-muted">en çok beğenilen entry&apos;si</p>
+              <p className="text-xs text-muted">
+                en çok beğenilen entry&apos;si
+              </p>
               <p className="mt-0.5 break-words leading-6">{snippet.metin}</p>
               <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs">
                 <span className="font-semibold text-gold-ink">
                   +{summary?.top_entry_upvotes}
                 </span>
                 {snippet.kesildi && (
-                  <Link href={topEntryHref} className="italic text-muted hover:text-ink">
+                  <Link
+                    href={topEntryHref}
+                    className="italic text-muted hover:text-ink"
+                  >
                     devamı
                   </Link>
                 )}
@@ -94,14 +103,19 @@ export default function ZihinOzet({
 
           {showTopTopic && summary?.top_topic_slug && (
             <p className="text-sm">
-              <span className="text-xs text-muted">en çok yazdığı başlık: </span>
+              <span className="text-xs text-muted">
+                en çok yazdığı başlık:{" "}
+              </span>
               <Link
                 href={`/baslik/${summary.top_topic_slug}`}
                 className="font-semibold text-gold-ink hover:underline"
               >
                 {summary.top_topic_title}
               </Link>
-              <span className="text-muted"> ({summary.top_topic_count} entry)</span>
+              <span className="text-muted">
+                {" "}
+                ({summary.top_topic_count} entry)
+              </span>
             </p>
           )}
         </div>

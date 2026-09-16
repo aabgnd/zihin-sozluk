@@ -37,7 +37,9 @@ export default function InfoModal({ className }: { className: string }) {
               <XIcon className="size-5" />
             </button>
           </div>
-          <p className="mt-3 text-[15px] leading-relaxed text-muted">{RULES_TEXT}</p>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted">
+            {RULES_TEXT}
+          </p>
         </div>
       </dialog>
     </>

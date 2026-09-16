@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MoreIcon } from "./icons";
 
-const copyItem = "flex h-11 w-full items-center px-4 text-left text-sm hover:bg-surface-2";
+const copyItem =
+  "flex h-11 w-full items-center px-4 text-left text-sm hover:bg-surface-2";
 
 export default function EntryMenu({
   entryHref,
@@ -40,7 +41,9 @@ export default function EntryMenu({
 
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}${entryHref}`);
+      await navigator.clipboard.writeText(
+        `${window.location.origin}${entryHref}`,
+      );
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -66,7 +69,12 @@ export default function EntryMenu({
           role="menu"
           className="absolute right-0 top-full z-30 mt-1 w-52 overflow-hidden rounded-md border border-line bg-surface py-1 shadow-sm"
         >
-          <button type="button" role="menuitem" onClick={copyLink} className={copyItem}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={copyLink}
+            className={copyItem}
+          >
             {copied ? "bağlantı kopyalandı" : "bağlantıyı kopyala"}
           </button>
           {children}

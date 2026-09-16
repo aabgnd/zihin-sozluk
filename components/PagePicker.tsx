@@ -29,11 +29,13 @@ export default function PagePicker({
         onChange={(event) => router.push(hrefFor(Number(event.target.value)))}
         className="h-9 rounded-md border border-line bg-surface px-2 text-sm text-ink focus:border-gold focus:outline-none"
       >
-        {Array.from({ length: pageCount }, (_, index) => index + 1).map((number) => (
-          <option key={number} value={number}>
-            {number}
-          </option>
-        ))}
+        {Array.from({ length: pageCount }, (_, index) => index + 1).map(
+          (number) => (
+            <option key={number} value={number}>
+              {number}
+            </option>
+          ),
+        )}
       </select>
       <span>/ {pageCount}</span>
       {page < pageCount && (

@@ -6,16 +6,25 @@ import Field from "@/components/Field";
 import type { FormState } from "@/lib/types";
 
 export default function LoginForm() {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(signIn, {});
-  const [resendState, resendAction, resending] = useActionState<FormState, FormData>(
-    resendConfirmation,
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    signIn,
     {},
   );
+  const [resendState, resendAction, resending] = useActionState<
+    FormState,
+    FormData
+  >(resendConfirmation, {});
 
   return (
     <>
       <form action={formAction} className="space-y-4">
-        <Field label="e-posta" name="email" type="email" autoComplete="email" required />
+        <Field
+          label="e-posta"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+        />
         <Field
           label="şifre"
           name="password"
@@ -38,7 +47,10 @@ export default function LoginForm() {
       </form>
 
       {state.unconfirmedEmail && (
-        <form action={resendAction} className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
+        <form
+          action={resendAction}
+          className="mt-4 space-y-2 border-t border-line pt-4 text-sm"
+        >
           <input type="hidden" name="email" value={state.unconfirmedEmail} />
           {resendState.message ? (
             <p role="status">{resendState.message}</p>

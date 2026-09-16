@@ -23,7 +23,11 @@ const themeScript = `try{var t=localStorage.getItem("tema");var d=t?t==="koyu":m
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="tr" className={`${sourceSans.variable} antialiased`} suppressHydrationWarning>
+    <html
+      lang="tr"
+      className={`${sourceSans.variable} antialiased`}
+      suppressHydrationWarning
+    >
       <head>
         <Script
           id="tema"

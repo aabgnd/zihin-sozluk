@@ -15,7 +15,10 @@ export default async function SignupPage() {
       <SignupForm />
       <p className="mt-6 text-sm text-muted">
         zaten hesabın var mı?{" "}
-        <Link href="/giris" className="font-semibold text-gold-ink hover:underline">
+        <Link
+          href="/giris"
+          className="font-semibold text-gold-ink hover:underline"
+        >
           giriş yap
         </Link>
       </p>

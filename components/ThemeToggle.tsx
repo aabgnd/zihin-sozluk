@@ -31,7 +31,11 @@ export default function ThemeToggle({ className }: { className: string }) {
       aria-label={isDark ? "açık moda geç" : "karanlık moda geç"}
       className={className}
     >
-      {isDark ? <SunIcon className="size-7" /> : <MoonIcon className="size-7" />}
+      {isDark ? (
+        <SunIcon className="size-7" />
+      ) : (
+        <MoonIcon className="size-7" />
+      )}
     </button>
   );
 }

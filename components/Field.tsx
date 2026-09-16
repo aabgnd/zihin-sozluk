@@ -1,6 +1,9 @@
 import type { InputHTMLAttributes } from "react";
 
-type Props = { label: string; name: string } & InputHTMLAttributes<HTMLInputElement>;
+type Props = {
+  label: string;
+  name: string;
+} & InputHTMLAttributes<HTMLInputElement>;
 
 export default function Field({ label, name, ...inputProps }: Props) {
   return (

@@ -4,7 +4,10 @@ import type { TopEntry, TopicListItem } from "@/lib/types";
 import SidebarTabs from "./SidebarTabs";
 
 export default async function TopicSidebar() {
-  const [topics, topRated] = await Promise.all([getAgendaTopics(), getYesterdayTop()]);
+  const [topics, topRated] = await Promise.all([
+    getAgendaTopics(),
+    getYesterdayTop(),
+  ]);
 
   return (
     <SidebarTabs
@@ -28,7 +31,9 @@ function AgendaList({ topics }: { topics: TopicListItem[] }) {
             className="flex items-start justify-between gap-3 rounded-md px-2 py-2.5 text-sm leading-snug text-ink hover:bg-surface-2"
           >
             <span className="break-words">{topic.title}</span>
-            <span className="shrink-0 pt-0.5 text-xs text-muted">{topic.entry_count}</span>
+            <span className="shrink-0 pt-0.5 text-xs text-muted">
+              {topic.entry_count}
+            </span>
           </Link>
         </li>
       ))}
@@ -51,7 +56,9 @@ function TopRatedList({ entries }: { entries: TopEntry[] }) {
           >
             <span className="flex items-baseline justify-between gap-3">
               <span className="break-words text-sm">{entry.topic_title}</span>
-              <span className="shrink-0 text-xs text-gold-ink">+{entry.upvotes}</span>
+              <span className="shrink-0 text-xs text-gold-ink">
+                +{entry.upvotes}
+              </span>
             </span>
             <span className="mt-0.5 line-clamp-2 block break-words text-xs text-muted">
               {entry.snippet}

@@ -24,7 +24,13 @@ export default function ResendForm() {
       <p className="text-sm leading-relaxed text-muted">
         e-posta adresini yaz, yeni bir onay bağlantısı gönderelim.
       </p>
-      <Field label="e-posta" name="email" type="email" autoComplete="email" required />
+      <Field
+        label="e-posta"
+        name="email"
+        type="email"
+        autoComplete="email"
+        required
+      />
       {state.error && (
         <p role="alert" className="text-sm text-danger">
           {state.error}

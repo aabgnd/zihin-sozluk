@@ -29,7 +29,10 @@ export default function EntryEditor({
   submitLabel = "gönder",
   cancelHref,
 }: Props) {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    action,
+    {},
+  );
   const [content, setContent] = useState(initialContent);
   const [draftRestored, setDraftRestored] = useState(false);
   const textarea = useRef<HTMLTextAreaElement>(null);

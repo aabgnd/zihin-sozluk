@@ -20,16 +20,23 @@ async function requireViewer() {
   return viewer;
 }
 
-export async function updateAvatar(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function updateAvatar(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const viewer = await requireViewer();
   const file = formData.get("avatar");
-  if (!(file instanceof File) || file.size === 0) return { error: "bir görsel seç." };
+  if (!(file instanceof File) || file.size === 0)
+    return { error: "bir görsel seç." };
 
   const extension = AVATAR_EXTENSIONS[file.type];
-  if (!extension) return { error: "sadece jpg, png ya da webp yükleyebilirsin." };
+  if (!extension)
+    return { error: "sadece jpg, png ya da webp yükleyebilirsin." };
   if (file.size > MAX_AVATAR_BYTES) {
     const sizeInMb = (file.size / 1024 / 1024).toFixed(1);
-    return { error: `görsel en fazla 2 mb olabilir. seçtiğin dosya ${sizeInMb} mb.` };
+    return {
+      error: `görsel en fazla 2 mb olabilir. seçtiğin dosya ${sizeInMb} mb.`,
+    };
   }
 
   const supabase = await createClient();
@@ -69,7 +76,10 @@ export async function removeAvatar() {
   const supabase = await createClient();
   const bucket = supabase.storage.from("avatars");
 
-  await supabase.from("profiles").update({ avatar_url: null }).eq("id", viewer.id);
+  await supabase
+    .from("profiles")
+    .update({ avatar_url: null })
+    .eq("id", viewer.id);
 
   const { data: files } = await bucket.list(viewer.id);
   if (files && files.length > 0) {
@@ -96,7 +106,9 @@ export async function blockUser(targetId: string) {
   if (targetId === viewer.id) return;
 
   const supabase = await createClient();
-  await supabase.from("blocks").insert({ blocker_id: viewer.id, blocked_id: targetId });
+  await supabase
+    .from("blocks")
+    .insert({ blocker_id: viewer.id, blocked_id: targetId });
   await syncOtherDevices(viewer.id);
   revalidatePath("/", "layout");
 }
@@ -104,7 +116,11 @@ export async function blockUser(targetId: string) {
 export async function unblockUser(targetId: string) {
   const viewer = await requireViewer();
   const supabase = await createClient();
-  await supabase.from("blocks").delete().eq("blocker_id", viewer.id).eq("blocked_id", targetId);
+  await supabase
+    .from("blocks")
+    .delete()
+    .eq("blocker_id", viewer.id)
+    .eq("blocked_id", targetId);
   await syncOtherDevices(viewer.id);
   revalidatePath("/", "layout");
 }

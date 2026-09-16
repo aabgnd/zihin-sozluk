@@ -38,7 +38,9 @@ export default function UserList({
           >
             <Avatar username={user.username} url={user.avatar_url} size="md" />
             <span className="min-w-0">
-              <span className="block break-words font-semibold">{user.username}</span>
+              <span className="block break-words font-semibold">
+                {user.username}
+              </span>
               {user.entry_count !== null && (
                 <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
                   <RankBadge entryCount={user.entry_count} />
@@ -53,7 +55,11 @@ export default function UserList({
               {followingIds?.has(user.id) ? (
                 <span className="text-[13px] text-muted">takip ediliyor</span>
               ) : (
-                <FollowButton targetId={user.id} isFollowing={false} size="sm" />
+                <FollowButton
+                  targetId={user.id}
+                  isFollowing={false}
+                  size="sm"
+                />
               )}
             </div>
           )}

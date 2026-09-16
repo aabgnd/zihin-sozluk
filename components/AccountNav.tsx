@@ -21,7 +21,8 @@ type Props = {
   iconButtonClass: string;
 };
 
-const menuItem = "flex h-11 w-full items-center gap-2.5 px-4 text-left text-[15px] hover:bg-page";
+const menuItem =
+  "flex h-11 w-full items-center gap-2.5 px-4 text-left text-[15px] hover:bg-page";
 
 // 9'dan fazlası "9+" olarak gösterilir.
 function badgeText(count: number) {
@@ -36,28 +37,51 @@ export default function AccountNav({
 }: Props) {
   const profileHref = `/yazar/${encodeURIComponent(viewer.username)}`;
   const isStaff = viewer.role === "admin" || viewer.role === "mod";
-  const messagesLabel = unreadMessages > 0 ? `mesajlar, ${unreadMessages} okunmamış` : "mesajlar";
+  const messagesLabel =
+    unreadMessages > 0 ? `mesajlar, ${unreadMessages} okunmamış` : "mesajlar";
   const notificationsLabel =
-    unreadNotifications > 0 ? `bildirimler, ${unreadNotifications} okunmamış` : "bildirimler";
+    unreadNotifications > 0
+      ? `bildirimler, ${unreadNotifications} okunmamış`
+      : "bildirimler";
 
   return (
     <>
-      <Link href="/mesajlar" aria-label={messagesLabel} className={iconButtonClass}>
+      <Link
+        href="/mesajlar"
+        aria-label={messagesLabel}
+        className={iconButtonClass}
+      >
         <MessageIcon className="size-7" />
-        {unreadMessages > 0 && <CountBadge>{badgeText(unreadMessages)}</CountBadge>}
+        {unreadMessages > 0 && (
+          <CountBadge>{badgeText(unreadMessages)}</CountBadge>
+        )}
       </Link>
 
-      <Link href="/bildirimler" aria-label={notificationsLabel} className={iconButtonClass}>
+      <Link
+        href="/bildirimler"
+        aria-label={notificationsLabel}
+        className={iconButtonClass}
+      >
         <BellIcon className="size-7" />
-        {unreadNotifications > 0 && <CountBadge>{badgeText(unreadNotifications)}</CountBadge>}
+        {unreadNotifications > 0 && (
+          <CountBadge>{badgeText(unreadNotifications)}</CountBadge>
+        )}
       </Link>
 
       <UserMenu
         label={`${viewer.username} menüsü`}
         triggerClassName={`${iconButtonClass} overflow-hidden`}
-        trigger={<Avatar username={viewer.username} url={viewer.avatar_url} size="md" />}
+        trigger={
+          <Avatar
+            username={viewer.username}
+            url={viewer.avatar_url}
+            size="md"
+          />
+        }
       >
-        <p className="border-b border-line px-4 pb-2 pt-1 text-sm font-bold">{viewer.username}</p>
+        <p className="border-b border-line px-4 pb-2 pt-1 text-sm font-bold">
+          {viewer.username}
+        </p>
         <MenuLink href={profileHref} icon={<UserIcon className="size-4" />}>
           ben
         </MenuLink>
@@ -67,14 +91,21 @@ export default function AccountNav({
         <MenuLink href="/bildirimler" icon={<BellIcon className="size-4" />}>
           bildirimler
         </MenuLink>
-        <MenuLink href={`${profileHref}?sekme=favoriler`} icon={<StarIcon className="size-4" />}>
+        <MenuLink
+          href={`${profileHref}?sekme=favoriler`}
+          icon={<StarIcon className="size-4" />}
+        >
           favoriler
         </MenuLink>
         <MenuLink href="/ayarlar" icon={<SettingsIcon className="size-4" />}>
           ayarlar
         </MenuLink>
         {isStaff && (
-          <MenuLink href="/yonetim" icon={<ShieldIcon className="size-4" />} highlight>
+          <MenuLink
+            href="/yonetim"
+            icon={<ShieldIcon className="size-4" />}
+            highlight
+          >
             yönetim
           </MenuLink>
         )}

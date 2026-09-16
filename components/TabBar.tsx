@@ -32,7 +32,10 @@ export function TabLinks({ active }: { active: TabKey | null }) {
             {tab.label}
           </Link>
         ))}
-        <a href="/rastgele" className={`${tabClass} border-transparent text-muted hover:text-ink`}>
+        <a
+          href="/rastgele"
+          className={`${tabClass} border-transparent text-muted hover:text-ink`}
+        >
           rastgele
         </a>
       </div>
@@ -44,7 +47,11 @@ export default function TabBar() {
   const pathname = usePathname();
   const list = useSearchParams().get("liste");
   const active: TabKey | null =
-    pathname !== "/" ? null : list === "bugun" || list === "dun" ? list : "gundem";
+    pathname !== "/"
+      ? null
+      : list === "bugun" || list === "dun"
+        ? list
+        : "gundem";
 
   return <TabLinks active={active} />;
 }

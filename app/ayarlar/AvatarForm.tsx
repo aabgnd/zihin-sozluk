@@ -8,7 +8,10 @@ const MAX_BYTES = 2 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export default function AvatarForm() {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(updateAvatar, {});
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    updateAvatar,
+    {},
+  );
   const [localError, setLocalError] = useState<string | null>(null);
 
   const checkFile = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +40,10 @@ export default function AvatarForm() {
   return (
     <form action={formAction} className="min-w-0 flex-1 space-y-2">
       <label htmlFor="avatar" className="block text-sm font-semibold">
-        yeni fotoğraf <span className="font-normal text-muted">(jpg, png, webp · en fazla 2 mb)</span>
+        yeni fotoğraf{" "}
+        <span className="font-normal text-muted">
+          (jpg, png, webp · en fazla 2 mb)
+        </span>
       </label>
       <input
         id="avatar"

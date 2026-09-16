@@ -9,5 +9,7 @@ export const SORT_OPTIONS = [
 export type SortValue = (typeof SORT_OPTIONS)[number]["value"];
 
 export function normalizeSort(value: string | undefined): SortValue {
-  return SORT_OPTIONS.some((option) => option.value === value) ? (value as SortValue) : "eski";
+  return SORT_OPTIONS.some((option) => option.value === value)
+    ? (value as SortValue)
+    : "eski";
 }

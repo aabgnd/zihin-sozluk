@@ -4,7 +4,11 @@ import { useState } from "react";
 import { SearchIcon, XIcon } from "./icons";
 import SearchForm from "./SearchForm";
 
-export default function MobileSearch({ buttonClassName }: { buttonClassName: string }) {
+export default function MobileSearch({
+  buttonClassName,
+}: {
+  buttonClassName: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -16,7 +20,11 @@ export default function MobileSearch({ buttonClassName }: { buttonClassName: str
         aria-expanded={open}
         className={buttonClassName}
       >
-        {open ? <XIcon className="size-6" /> : <SearchIcon className="size-6" />}
+        {open ? (
+          <XIcon className="size-6" />
+        ) : (
+          <SearchIcon className="size-6" />
+        )}
       </button>
 
       {open && (

@@ -8,7 +8,8 @@ export default function RankBadge({
   size?: "sm" | "md";
 }) {
   const rutbe = rutbeBul(entryCount);
-  const sizeClass = size === "md" ? "px-2.5 py-0.5 text-sm" : "px-2 py-px text-[13px]";
+  const sizeClass =
+    size === "md" ? "px-2.5 py-0.5 text-sm" : "px-2 py-px text-[13px]";
 
   return (
     <span

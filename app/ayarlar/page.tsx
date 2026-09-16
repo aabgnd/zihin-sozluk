@@ -24,7 +24,9 @@ export default async function SettingsPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("blocks")
-    .select("blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)")
+    .select(
+      "blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)",
+    )
     .eq("blocker_id", viewer.id)
     .order("created_at", { ascending: false });
   const blocks = (data ?? []) as unknown as BlockRow[];
@@ -37,7 +39,8 @@ export default async function SettingsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <ThemeToggle className="grid size-11 place-items-center rounded-md border border-line hover:bg-surface-2" />
           <p className="text-sm text-muted">
-            açık ve karanlık mod arasında geçiş yapar. tercihin bu cihazda saklanır.
+            açık ve karanlık mod arasında geçiş yapar. tercihin bu cihazda
+            saklanır.
           </p>
         </div>
       </SettingsSection>
@@ -45,7 +48,11 @@ export default async function SettingsPage() {
       <SettingsSection title="profil fotoğrafı">
         <div className="flex flex-wrap items-start gap-4">
           <div className="space-y-2">
-            <Avatar username={viewer.username} url={viewer.avatar_url} size="lg" />
+            <Avatar
+              username={viewer.username}
+              url={viewer.avatar_url}
+              size="lg"
+            />
             {viewer.avatar_url && (
               <ConfirmButton
                 action={removeAvatar}
@@ -67,7 +74,10 @@ export default async function SettingsPage() {
             ? "özel mesajların açık, yazarlar sana mesaj atabilir."
             : "özel mesajların kapalı, kimse sana yeni mesaj atamaz. eski mesajlarını okumaya devam edebilirsin."}
         </p>
-        <form action={setAllowMessages.bind(null, !viewer.allow_messages)} className="mt-3">
+        <form
+          action={setAllowMessages.bind(null, !viewer.allow_messages)}
+          className="mt-3"
+        >
           <button
             type="submit"
             role="switch"
@@ -78,7 +88,9 @@ export default async function SettingsPage() {
                 : "bg-gold text-on-gold hover:brightness-95"
             }`}
           >
-            {viewer.allow_messages ? "özel mesajları kapat" : "özel mesajları aç"}
+            {viewer.allow_messages
+              ? "özel mesajları kapat"
+              : "özel mesajları aç"}
           </button>
         </form>
       </SettingsSection>
@@ -98,8 +110,13 @@ export default async function SettingsPage() {
                     href={`/yazar/${encodeURIComponent(block.blocked.username)}`}
                     className="inline-flex min-w-0 items-center gap-2 font-semibold text-gold-ink hover:underline"
                   >
-                    <Avatar username={block.blocked.username} url={block.blocked.avatar_url} />
-                    <span className="break-words">{block.blocked.username}</span>
+                    <Avatar
+                      username={block.blocked.username}
+                      url={block.blocked.avatar_url}
+                    />
+                    <span className="break-words">
+                      {block.blocked.username}
+                    </span>
                   </Link>
                 ) : (
                   <span className="text-muted">silinmiş hesap</span>
@@ -121,7 +138,13 @@ export default async function SettingsPage() {
   );
 }
 
-function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
+function SettingsSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
   return (
     <div className="border-b border-line py-5">
       <h2 className="mb-2 text-sm font-semibold">{title}</h2>

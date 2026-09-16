@@ -12,7 +12,8 @@ export default function FollowButton({
   isFollowing: boolean;
   size?: "sm" | "md";
 }) {
-  const [optimisticFollowing, setOptimisticFollowing] = useOptimistic(isFollowing);
+  const [optimisticFollowing, setOptimisticFollowing] =
+    useOptimistic(isFollowing);
   const [pending, startTransition] = useTransition();
 
   const toggle = () => {
@@ -24,7 +25,8 @@ export default function FollowButton({
     });
   };
 
-  const sizeClass = size === "sm" ? "h-9 px-3 text-[13px]" : "h-10 px-4 text-sm";
+  const sizeClass =
+    size === "sm" ? "h-9 px-3 text-[13px]" : "h-10 px-4 text-sm";
 
   return (
     <button

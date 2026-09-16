@@ -20,7 +20,11 @@ export default function SidebarTabs({
 
   return (
     <nav aria-label="gündem">
-      <div role="tablist" aria-label="gündem sekmeleri" className="mb-2 flex gap-4">
+      <div
+        role="tablist"
+        aria-label="gündem sekmeleri"
+        className="mb-2 flex gap-4"
+      >
         <button
           type="button"
           role="tab"

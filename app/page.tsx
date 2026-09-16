@@ -21,7 +21,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       <TopicSection
         heading={`${day.label} başlıkları`}
         topics={(data ?? []) as TopicListItem[]}
-        empty={list === "bugun" ? "bugün henüz entry girilmedi." : "dün entry girilmemiş."}
+        empty={
+          list === "bugun"
+            ? "bugün henüz entry girilmedi."
+            : "dün entry girilmemiş."
+        }
       />
     );
   }
@@ -32,7 +36,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   // 2. sayfadan itibaren gündem listesi masaüstünde de ana sütunda gösterilir.
   if (page > 1) {
     return (
-      <TopicSection heading="gündem" topics={topics} empty="bu sayfada başlık yok.">
+      <TopicSection
+        heading="gündem"
+        topics={topics}
+        empty="bu sayfada başlık yok."
+      >
         <PageNumbers basePath="/" page={page} pageCount={pageCount} />
       </TopicSection>
     );
@@ -49,7 +57,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   ]);
   const entries = (data ?? []) as unknown as EntryRow[];
   const authorIds = [
-    ...new Set(entries.flatMap((entry) => (entry.author ? [entry.author.id] : []))),
+    ...new Set(
+      entries.flatMap((entry) => (entry.author ? [entry.author.id] : [])),
+    ),
   ];
 
   const [{ votes, favorites }, countResult] = await Promise.all([
@@ -62,10 +72,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       : Promise.resolve({ data: [] }),
   ]);
   const authorCounts = new Map(
-    ((countResult.data ?? []) as { user_id: string; entry_count: number }[]).map((row) => [
-      row.user_id,
-      row.entry_count,
-    ]),
+    (
+      (countResult.data ?? []) as { user_id: string; entry_count: number }[]
+    ).map((row) => [row.user_id, row.entry_count]),
   );
 
   return (
@@ -81,10 +90,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       </div>
 
       <section className="hidden lg:block">
-        <h1 className="border-b border-line pb-3 text-2xl font-bold">{"son entry'ler"}</h1>
+        <h1 className="border-b border-line pb-3 text-2xl font-bold">
+          {"son entry'ler"}
+        </h1>
         {entries.length === 0 ? (
           <p className="py-4 leading-relaxed text-muted">
-            {"henüz entry yok. arama kutusuna bir başlık yazıp ilk entry'yi sen gir."}
+            {
+              "henüz entry yok. arama kutusuna bir başlık yazıp ilk entry'yi sen gir."
+            }
           </p>
         ) : (
           entries.map((entry) => (
@@ -95,7 +108,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               isStaff={viewer?.isStaff ?? false}
               myVote={votes.get(entry.id)}
               favorited={favorites.has(entry.id)}
-              authorEntryCount={entry.author ? (authorCounts.get(entry.author.id) ?? null) : null}
+              authorEntryCount={
+                entry.author
+                  ? (authorCounts.get(entry.author.id) ?? null)
+                  : null
+              }
               showTopic
             />
           ))
@@ -118,7 +135,9 @@ function TopicSection({
 }) {
   return (
     <section>
-      <h1 className="border-b border-line pb-3 text-2xl font-bold">{heading}</h1>
+      <h1 className="border-b border-line pb-3 text-2xl font-bold">
+        {heading}
+      </h1>
       <TopicList topics={topics} empty={empty} />
       {children && <div className="pt-4">{children}</div>}
     </section>
