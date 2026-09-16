@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-const box =
-  "grid h-10 min-w-10 place-items-center rounded-lg border px-2 text-sm";
+const box = "grid h-9 min-w-9 place-items-center rounded-md px-2 text-sm";
 
 export default function PageNumbers({
   basePath,
@@ -22,23 +21,18 @@ export default function PageNumbers({
   }
 
   return (
-    <nav aria-label="sayfalar" className="flex flex-wrap items-center gap-1.5">
+    <nav aria-label="sayfalar" className="flex flex-wrap items-center gap-1">
       {pages.map((candidate, index) => (
-        <span key={candidate} className="flex items-center gap-1.5">
-          {index > 0 && candidate - pages[index - 1] > 1 && (
-            <span className="text-muted">…</span>
-          )}
+        <span key={candidate} className="flex items-center gap-1">
+          {index > 0 && candidate - pages[index - 1] > 1 && <span className="text-muted">…</span>}
           {candidate === page ? (
-            <span
-              aria-current="page"
-              className={`${box} border-gold bg-gold font-bold text-on-gold`}
-            >
+            <span aria-current="page" className={`${box} bg-gold font-semibold text-on-gold`}>
               {candidate}
             </span>
           ) : (
             <Link
               href={`${basePath}?sayfa=${candidate}`}
-              className={`${box} border-line text-gold-ink hover:bg-page`}
+              className={`${box} border border-line text-ink hover:bg-surface-2`}
             >
               {candidate}
             </Link>

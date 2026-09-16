@@ -1,9 +1,6 @@
 import type { InputHTMLAttributes } from "react";
 
-type Props = {
-  label: string;
-  name: string;
-} & InputHTMLAttributes<HTMLInputElement>;
+type Props = { label: string; name: string } & InputHTMLAttributes<HTMLInputElement>;
 
 export default function Field({ label, name, ...inputProps }: Props) {
   return (
@@ -15,7 +12,7 @@ export default function Field({ label, name, ...inputProps }: Props) {
         id={name}
         name={name}
         {...inputProps}
-        className="block h-11 w-full rounded-lg border border-line bg-surface px-3 text-base focus:border-gold focus:outline-none"
+        className="block h-11 w-full rounded-md border border-line bg-surface px-3 text-[15px] focus:border-gold focus:outline-none"
       />
     </div>
   );

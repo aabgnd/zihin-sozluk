@@ -22,13 +22,16 @@ export default function UserList({
   followingIds?: Set<string>;
 }) {
   if (users.length === 0) {
-    return <p className="px-4 py-4 text-muted">{empty}</p>;
+    return <p className="py-4 text-muted">{empty}</p>;
   }
 
   return (
-    <ul className="divide-y divide-line">
+    <ul>
       {users.map((user) => (
-        <li key={user.id} className="flex items-center gap-3 px-4 py-3">
+        <li
+          key={user.id}
+          className="flex items-center gap-3 border-b border-line py-3 last:border-b-0"
+        >
           <Link
             href={`/yazar/${encodeURIComponent(user.username)}`}
             className="flex min-w-0 flex-1 items-center gap-3 hover:opacity-90"
@@ -48,7 +51,7 @@ export default function UserList({
           {viewerId && viewerId !== user.id && (
             <div className="shrink-0">
               {followingIds?.has(user.id) ? (
-                <span className="text-[13px] font-semibold text-muted">takip ediliyor</span>
+                <span className="text-[13px] text-muted">takip ediliyor</span>
               ) : (
                 <FollowButton targetId={user.id} isFollowing={false} size="sm" />
               )}

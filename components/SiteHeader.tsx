@@ -5,10 +5,12 @@ import { getViewer } from "@/lib/viewer";
 import AccountNav from "./AccountNav";
 import InfoModal from "./InfoModal";
 import LiveRefresh from "./LiveRefresh";
+import MobileAgendaDrawer from "./MobileAgendaDrawer";
 import MobileSearch from "./MobileSearch";
 import SearchForm from "./SearchForm";
 import TabBar, { TabLinks } from "./TabBar";
 import ThemeToggle from "./ThemeToggle";
+import TopicSidebar from "./TopicSidebar";
 
 // Dokunma alanı 44px.
 const iconButton =
@@ -56,6 +58,12 @@ export default async function SiteHeader() {
 
       <div className="relative border-b border-line">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-3 px-4">
+          <div className="lg:hidden">
+            <MobileAgendaDrawer buttonClassName={iconButton}>
+              <TopicSidebar />
+            </MobileAgendaDrawer>
+          </div>
+
           <Link
             href="/"
             aria-label="zihin sözlük ana sayfa"

@@ -29,10 +29,7 @@ export default function EntryEditor({
   submitLabel = "gönder",
   cancelHref,
 }: Props) {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(
-    action,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
   const [content, setContent] = useState(initialContent);
   const [draftRestored, setDraftRestored] = useState(false);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -86,19 +83,15 @@ export default function EntryEditor({
   };
 
   return (
-    <form
-      action={formAction}
-      onSubmit={clearDraft}
-      className="space-y-2 rounded-xl border border-line bg-surface p-4 shadow-sm"
-    >
+    <form action={formAction} onSubmit={clearDraft} className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label htmlFor="content" className="text-sm font-bold">
+        <label htmlFor="content" className="text-sm font-semibold">
           {label}
         </label>
         <button
           type="button"
           onClick={wrapSelectionWithSpoiler}
-          className="h-9 rounded-lg border border-line px-3 text-xs font-semibold text-muted hover:text-ink"
+          className="h-9 rounded-md border border-line px-3 text-xs text-muted hover:bg-surface-2 hover:text-ink"
         >
           spoiler ekle
         </button>
@@ -113,7 +106,7 @@ export default function EntryEditor({
         rows={5}
         value={content}
         onChange={(event) => setContent(event.target.value)}
-        className="block w-full rounded-lg border border-line bg-page p-3 text-base leading-7 focus:border-gold focus:outline-none"
+        className="block w-full rounded-md border border-line bg-surface p-3 text-[15px] leading-7 focus:border-gold focus:outline-none"
       />
 
       {draftRestored && (
@@ -139,14 +132,14 @@ export default function EntryEditor({
         <button
           type="submit"
           disabled={pending}
-          className="h-11 rounded-lg bg-gold px-5 font-bold text-on-gold hover:brightness-95 disabled:opacity-60"
+          className="h-10 rounded-md bg-gold px-5 text-sm font-semibold text-on-gold hover:brightness-95 disabled:opacity-60"
         >
           {pending ? "gönderiliyor…" : submitLabel}
         </button>
         {cancelHref && (
           <Link
             href={cancelHref}
-            className="flex h-11 items-center rounded-lg border border-line px-4 text-sm font-semibold hover:bg-page"
+            className="flex h-10 items-center rounded-md border border-line px-4 text-sm hover:bg-surface-2"
           >
             vazgeç
           </Link>
