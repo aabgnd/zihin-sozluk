@@ -4,7 +4,10 @@ import { useActionState } from "react";
 import type { FormAction, FormState } from "@/lib/types";
 
 export default function MessageForm({ action }: { action: FormAction }) {
-  const [state, formAction, pending] = useActionState<FormState, FormData>(action, {});
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    action,
+    {},
+  );
 
   return (
     <form

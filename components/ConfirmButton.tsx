@@ -1,17 +1,20 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 
 export default function ConfirmButton({
   action,
   label,
+  ariaLabel,
   title,
   description,
   confirmLabel = "sil",
   className,
 }: {
   action: () => Promise<void>;
-  label: string;
+  label: ReactNode;
+  /** label bir ikonsa ekran okuyucu için gerekir. */
+  ariaLabel?: string;
   title: string;
   description?: string;
   confirmLabel?: string;
@@ -24,6 +27,7 @@ export default function ConfirmButton({
       <button
         type="button"
         onClick={() => dialog.current?.showModal()}
+        aria-label={ariaLabel}
         className={className}
       >
         {label}

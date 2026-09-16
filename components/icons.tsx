@@ -111,7 +111,10 @@ export function FlagIcon({ className }: IconProps) {
   );
 }
 
-export function HeartIcon({ className, filled = false }: IconProps & { filled?: boolean }) {
+export function HeartIcon({
+  className,
+  filled = false,
+}: IconProps & { filled?: boolean }) {
   if (filled) {
     return (
       <svg {...solid} className={className}>
@@ -189,6 +192,15 @@ export function ArrowUpIcon({ className }: IconProps) {
     <svg {...stroke} className={className}>
       <path d="M12 19V5" />
       <path d="m5 12 7-7 7 7" />
+    </svg>
+  );
+}
+
+export function TrashIcon({ className }: IconProps) {
+  return (
+    <svg {...solid} className={className}>
+      <path d="M9.5 2.5a1 1 0 0 0-1 1V4H4.8a.8.8 0 0 0 0 1.6h14.4a.8.8 0 0 0 0-1.6H15.5v-.5a1 1 0 0 0-1-1h-5Z" />
+      <path d="M6.2 7.2h11.6l-.8 12a1.8 1.8 0 0 1-1.8 1.7H8.8A1.8 1.8 0 0 1 7 19.2l-.8-12Z" />
     </svg>
   );
 }

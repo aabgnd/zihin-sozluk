@@ -39,6 +39,32 @@ export async function sendMessage(
   return {};
 }
 
+/** Tek mesaji yalnizca silen kisinin tarafinda gizler. */
+export async function deleteMessage(id: number) {
+  const viewer = await getViewer();
+  if (!viewer) redirect("/giris");
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_message", { target: id });
+  if (error) throw new Error("mesaj silinemedi");
+
+  revalidatePath("/", "layout");
+}
+
+/** Bir kisiyle olan tum yazismayi yalnizca silen kisinin tarafinda gizler. */
+export async function deleteConversation(otherId: string) {
+  const viewer = await getViewer();
+  if (!viewer) redirect("/giris");
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_conversation", {
+    other: otherId,
+  });
+  if (error) throw new Error("konuşma silinemedi");
+
+  revalidatePath("/", "layout");
+}
+
 export async function markConversationRead(otherId: string) {
   const viewer = await getViewer();
   if (!viewer) return;

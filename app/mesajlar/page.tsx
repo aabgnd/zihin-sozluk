@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Avatar from "@/components/Avatar";
+import DeletableRow from "@/components/DeletableRow";
 import LiveRefresh from "@/components/LiveRefresh";
+import LocalTime from "@/components/LocalTime";
 import { MESSAGE_COLUMNS } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
-import { formatDateTime } from "@/lib/text";
 import type { MessageRow } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
+import { deleteConversation } from "./actions";
 
 export const metadata: Metadata = { title: "mesajlar" };
 
@@ -18,18 +20,23 @@ export default async function MessagesPage() {
   if (!viewer) redirect("/giris");
 
   const supabase = await createClient();
+  // Kendi tarafında silinmiş mesajlar hiç gelmez.
   const { data } = await supabase
     .from("messages")
     .select(MESSAGE_COLUMNS)
-    .or(`sender_id.eq.${viewer.id},receiver_id.eq.${viewer.id}`)
+    .or(
+      `and(sender_id.eq.${viewer.id},sender_deleted_at.is.null),and(receiver_id.eq.${viewer.id},receiver_deleted_at.is.null)`,
+    )
     .order("created_at", { ascending: false })
     .limit(500);
   const messages = (data ?? []) as MessageRow[];
 
   const conversations = new Map<string, { last: MessageRow; unread: number }>();
   for (const message of messages) {
-    const otherId = message.sender_id === viewer.id ? message.receiver_id : message.sender_id;
-    const unread = message.receiver_id === viewer.id && !message.is_read ? 1 : 0;
+    const otherId =
+      message.sender_id === viewer.id ? message.receiver_id : message.sender_id;
+    const unread =
+      message.receiver_id === viewer.id && !message.is_read ? 1 : 0;
     const conversation = conversations.get(otherId);
     if (conversation) conversation.unread += unread;
     else conversations.set(otherId, { last: message, unread });
@@ -37,9 +44,14 @@ export default async function MessagesPage() {
 
   const otherIds = [...conversations.keys()];
   const { data: peopleData } = otherIds.length
-    ? await supabase.from("profiles").select("id, username, avatar_url").in("id", otherIds)
+    ? await supabase
+        .from("profiles")
+        .select("id, username, avatar_url")
+        .in("id", otherIds)
     : { data: [] };
-  const people = new Map(((peopleData ?? []) as Person[]).map((person) => [person.id, person]));
+  const people = new Map(
+    ((peopleData ?? []) as Person[]).map((person) => [person.id, person]),
+  );
 
   return (
     <section>
@@ -65,31 +77,46 @@ export default async function MessagesPage() {
             if (!person) return null;
             return (
               <li key={otherId} className="border-b border-line">
-                <Link
-                  href={`/mesajlar/${encodeURIComponent(person.username)}`}
-                  className="flex items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
+                <DeletableRow
+                  action={deleteConversation.bind(null, otherId)}
+                  ariaLabel={`${person.username} ile olan konuşmayı sil`}
+                  title="bu konuşma silinsin mi?"
+                  description="yazışma yalnızca senin tarafında silinir, karşı taraf kendi kopyasını görmeye devam eder."
+                  className="flex items-center gap-1"
                 >
-                  <Avatar username={person.username} url={person.avatar_url} size="md" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className={`break-words ${unread > 0 ? "font-bold" : "font-semibold"}`}>
-                        {person.username}
-                      </span>
-                      <time dateTime={last.created_at} className="shrink-0 text-xs text-muted">
-                        {formatDateTime(last.created_at)}
-                      </time>
+                  <Link
+                    href={`/mesajlar/${encodeURIComponent(person.username)}`}
+                    className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
+                  >
+                    <Avatar
+                      username={person.username}
+                      url={person.avatar_url}
+                      size="md"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span
+                          className={`break-words ${unread > 0 ? "font-bold" : "font-semibold"}`}
+                        >
+                          {person.username}
+                        </span>
+                        <LocalTime
+                          iso={last.created_at}
+                          className="shrink-0 text-xs text-muted"
+                        />
+                      </div>
+                      <p className="line-clamp-1 break-all text-sm text-muted">
+                        {last.sender_id === viewer.id ? "sen: " : ""}
+                        {last.content}
+                      </p>
                     </div>
-                    <p className="line-clamp-1 break-all text-sm text-muted">
-                      {last.sender_id === viewer.id ? "sen: " : ""}
-                      {last.content}
-                    </p>
-                  </div>
-                  {unread > 0 && (
-                    <span className="shrink-0 rounded-full bg-alert px-2 py-0.5 text-xs font-bold text-on-alert">
-                      {unread}
-                    </span>
-                  )}
-                </Link>
+                    {unread > 0 && (
+                      <span className="shrink-0 rounded-full bg-alert px-2 py-0.5 text-xs font-bold text-on-alert">
+                        {unread}
+                      </span>
+                    )}
+                  </Link>
+                </DeletableRow>
               </li>
             );
           })}
