@@ -16,12 +16,23 @@ const NOTICES: Record<string, string> = {
 
 export default async function LoginPage({ searchParams }: PageProps<"/giris">) {
   if (await getViewer()) redirect("/");
-  const hata = firstParam((await searchParams).hata) ?? "";
+  const params = await searchParams;
+  const hata = firstParam(params.hata) ?? "";
   const notice = NOTICES[hata];
+  const onaylandi = firstParam(params.onay) === "tamam";
 
   return (
     <section className="mx-auto max-w-sm py-4">
       <h1 className="mb-5 text-2xl font-bold">giriş</h1>
+      {onaylandi && (
+        <p
+          role="status"
+          className="mb-4 rounded-md border border-gold px-3 py-2 text-sm leading-relaxed"
+        >
+          <span className="font-semibold">hesabın onaylandı.</span> şimdi
+          e-postan ve şifrenle giriş yapabilirsin.
+        </p>
+      )}
       {notice && (
         <p
           role="alert"

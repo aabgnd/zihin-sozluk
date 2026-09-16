@@ -40,6 +40,12 @@ export async function confirmEmail(request: NextRequest) {
     if (code) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
       if (!error) return NextResponse.redirect(new URL(varisYeri, request.url));
+
+      // Buraya code ile gelindiyse Supabase e-postayı zaten onaylamıştır;
+      // /auth/v1/verify once dogrular, sonra bu adrese yonlendirir. Basarisiz
+      // olan tek sey bu tarayicida oturum acmak: PKCE dogrulayici cerezi
+      // kayit olunan cihazda kaldi. Kullaniciya hata degil, giris davetiyesi.
+      return NextResponse.redirect(new URL("/giris?onay=tamam", request.url));
     }
   }
 
