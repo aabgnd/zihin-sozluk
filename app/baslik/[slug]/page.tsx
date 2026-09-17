@@ -9,7 +9,12 @@ import EntryEditor from "@/components/EntryEditor";
 import LiveRefresh from "@/components/LiveRefresh";
 import PagePicker from "@/components/PagePicker";
 import SortSelect from "@/components/SortSelect";
-import { ENTRY_SELECT, getViewerEntryState } from "@/lib/entries";
+import EntryHighlight from "@/components/EntryHighlight";
+import {
+  ENTRY_PAGE_SIZE,
+  ENTRY_SELECT,
+  getViewerEntryState,
+} from "@/lib/entries";
 import { isPermanentMute } from "@/lib/moderation";
 import { normalizeSort } from "@/lib/siralama";
 import { createClient } from "@/lib/supabase/server";
@@ -17,7 +22,8 @@ import { firstParam, formatDateTime } from "@/lib/text";
 import type { EntryRow, Viewer } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
-const PAGE_SIZE = 10;
+// Tek kaynak: /entry/[no] hangi sayfaya yönlendireceğini bununla hesaplıyor.
+const PAGE_SIZE = ENTRY_PAGE_SIZE;
 
 export default async function TopicPage({
   params,
@@ -102,6 +108,7 @@ export default async function TopicPage({
           { table: "entries", filter: `topic_id=eq.${topic.id}` },
         ]}
       />
+      <EntryHighlight />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         {/* Açık başlık, listelerdeki aktif başlıkla aynı sarıda. */}

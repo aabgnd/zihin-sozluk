@@ -161,9 +161,13 @@ export default function EntryCard({
         </div>
       </div>
 
-      {author && (
-        <div className="mt-3 flex items-center justify-end gap-2.5">
-          <div className="min-w-0 text-right">
+      {/*
+        Numara her entry'de görünür; yazarı silinmiş entry'lerde de. Numara
+        entry'nin id'sidir: tekrarsız, değişmez ve kalıcı adresi /entry/<id>.
+      */}
+      <div className="mt-3 flex items-center justify-end gap-2.5">
+        <div className="min-w-0 text-right">
+          {author ? (
             <div className="flex flex-wrap items-center justify-end gap-1.5">
               <Link
                 href={`/yazar/${encodeURIComponent(author.username)}`}
@@ -175,11 +179,22 @@ export default function EntryCard({
                 <RankBadge entryCount={authorEntryCount} />
               )}
             </div>
-            <LocalTime
-              iso={entry.created_at}
-              className="mt-0.5 block text-xs text-muted"
-            />
+          ) : (
+            <span className="text-sm text-muted">silinmiş hesap</span>
+          )}
+          <div className="mt-0.5 flex items-center justify-end gap-1.5 text-xs text-muted">
+            <Link
+              href={`/entry/${entry.id}`}
+              aria-label={`entry ${entry.id} kalıcı bağlantısı`}
+              className="font-semibold text-gold-ink hover:underline"
+            >
+              #{entry.id}
+            </Link>
+            <span aria-hidden="true">·</span>
+            <LocalTime iso={entry.created_at} />
           </div>
+        </div>
+        {author && (
           <Link
             href={`/yazar/${encodeURIComponent(author.username)}`}
             aria-hidden="true"
@@ -191,8 +206,8 @@ export default function EntryCard({
               size="md"
             />
           </Link>
-        </div>
-      )}
+        )}
+      </div>
     </article>
   );
 }

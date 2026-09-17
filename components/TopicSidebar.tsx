@@ -27,17 +27,18 @@ function AgendaList({ topics }: { topics: TopicListItem[] }) {
       {topics.map((topic) => (
         <li key={topic.slug}>
           {/*
-            Masaüstünde (lg+) açık başlık sarı şeridin içinde, yazısı koyu.
-            Fareyle üzerine gelinince şerit yok, yalnızca yazı sarıya döner.
-            lg altında mobil görünüm korunur: şerit yok, yazı sarı ve kalın.
+            Açık başlık sarı şeridin içinde, yazısı koyu. Fareyle üzerine
+            gelinince şerit çıkmaz, yalnızca yazı sarıya döner. Aktif öğe
+            hover'da da şeridini korur; yoksa sarı zemin üzerinde sarı yazı
+            çıkıp okunmaz hale gelirdi.
           */}
           <TopicLink
             slug={topic.slug}
             className="group flex items-start justify-between gap-3 rounded-md px-2 py-2.5 text-sm leading-snug text-ink hover:bg-surface-2 hover:text-logo"
-            activeClassName="font-semibold text-logo lg:bg-gold lg:text-on-gold lg:hover:bg-gold lg:hover:text-on-gold"
+            activeClassName="bg-gold font-semibold text-on-gold hover:bg-gold hover:text-on-gold"
           >
             <span className="break-words">{topic.title}</span>
-            <span className="shrink-0 pt-0.5 text-xs text-muted lg:group-aria-[current=page]:text-on-gold">
+            <span className="shrink-0 pt-0.5 text-xs text-muted group-aria-[current=page]:text-on-gold">
               {topic.entry_count}
             </span>
           </TopicLink>

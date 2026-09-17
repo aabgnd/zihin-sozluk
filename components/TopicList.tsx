@@ -18,8 +18,8 @@ export default function TopicList({
         <li key={topic.slug} className="border-b border-line last:border-b-0">
           <TopicLink
             slug={topic.slug}
-            className="flex min-h-12 items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
-            activeClassName="font-semibold text-logo"
+            className="group flex min-h-12 items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2 hover:text-logo"
+            activeClassName="bg-gold font-semibold text-on-gold hover:bg-gold hover:text-on-gold"
           >
             <span className="break-words leading-snug">{topic.title}</span>
             <span className="ml-auto flex shrink-0 items-baseline gap-2 text-xs">
@@ -30,7 +30,9 @@ export default function TopicList({
                     +{topic.today_count}
                   </span>
                 )}
-              <span className="text-muted">{topic.entry_count}</span>
+              <span className="text-muted group-aria-[current=page]:text-on-gold">
+                {topic.entry_count}
+              </span>
             </span>
           </TopicLink>
         </li>

@@ -94,6 +94,33 @@ html {
 }
 
 /*
+ * /entry/<numara> ile gelen entry kısa süre vurgulanır.
+ * Sabit renk yazılmadı; tek sarı token'ından türetiliyor.
+ */
+[id^="entry-"] {
+  scroll-margin-top: 5rem;
+}
+
+.entry-vurgu {
+  animation: entry-vurgu 2.2s ease-out;
+  border-radius: 0.5rem;
+}
+
+@keyframes entry-vurgu {
+  0%,
+  35% {
+    background-color: color-mix(
+      in srgb,
+      var(--zihin-yellow) 26%,
+      transparent
+    );
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/*
  * Mobilde form alanları en az 16px.
  *
  * iOS ve Android, yazı boyutu 16px'in altında olan bir alana odaklanıldığında

@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 
+/** Başlık sayfasında bir sayfadaki entry sayısı. /entry/[no] da bunu kullanır. */
+export const ENTRY_PAGE_SIZE = 10;
+
 export const ENTRY_SELECT =
   "id, content, upvotes, downvotes, created_at, edited_at, author:profiles!entries_user_id_fkey(id, username, avatar_url, generation, title, allow_messages, status), topic:topics!entries_topic_id_fkey(title, slug), favorites(count)";
 
