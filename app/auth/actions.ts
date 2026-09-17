@@ -1,7 +1,9 @@
 "use server";
 
 import type { AuthError } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { YENILEME_COOKIE } from "@/lib/recovery";
 import { onayAdresi, siteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import type { FormState } from "@/lib/types";
@@ -14,6 +16,7 @@ const AUTH_ERRORS: Record<string, string> = {
     "e-posta adresini henüz onaylamamışsın. gelen kutunu kontrol et.",
   user_already_exists: "bu e-posta ile zaten kayıt olunmuş.",
   weak_password: "şifre çok zayıf, daha güçlü bir şifre seç.",
+  same_password: "yeni şifren eskisiyle aynı. farklı bir şifre seç.",
   over_email_send_rate_limit:
     "çok fazla deneme yapıldı. biraz bekleyip tekrar dene.",
   over_request_rate_limit:
@@ -147,9 +150,52 @@ export async function updatePassword(
   if (password.length < 8) return { error: "şifre en az 8 karakter olmalı." };
   if (password !== tekrar) return { error: "şifreler birbirini tutmuyor." };
 
+  const cookieStore = await cookies();
+  // İzin yalnızca sunucuda yazılan httpOnly çerezden okunur; adres
+  // parametresi ya da tarayıcı deposu gibi değiştirilebilir bir kaynaktan değil.
+  const yenilemeIzni = cookieStore.get(YENILEME_COOKIE)?.value === "1";
+
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) {
+    return { error: "bağlantının süresi dolmuş. yeni bir bağlantı iste." };
+  }
+
+  // Bağlantıyla gelmeyen herkes mevcut şifresini bilmek zorunda: açık kalmış
+  // bir oturumu ele geçiren kişi şifreyi değiştirememeli.
+  if (!yenilemeIzni) {
+    const { data: kalan } = await supabase.rpc("sifre_kilit_kalan");
+    if (typeof kalan === "number" && kalan > 0) {
+      const dakika = Math.ceil(kalan / 60);
+      return {
+        error: `çok fazla yanlış deneme yaptın. ${dakika} dakika sonra tekrar dene.`,
+      };
+    }
+
+    const mevcut = String(formData.get("mevcut_sifre") ?? "");
+    if (!mevcut) return { error: "mevcut şifreni yaz." };
+
+    const { error: dogrulama } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: mevcut,
+    });
+    if (dogrulama) {
+      await supabase.rpc("sifre_deneme_basarisiz");
+      return { error: "mevcut şifren hatalı." };
+    }
+
+    await supabase.rpc("sifre_deneme_sifirla");
+  }
+
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return authError(error);
+
+  // Şifre değişti: diğer cihazlardaki oturumlar kapansın.
+  await supabase.auth.signOut({ scope: "others" });
+  // İzin tek kullanımlık.
+  cookieStore.delete(YENILEME_COOKIE);
 
   redirect("/");
 }

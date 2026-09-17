@@ -68,6 +68,18 @@ export default async function SettingsPage() {
         </div>
       </SettingsSection>
 
+      <SettingsSection title="güvenlik">
+        <p className="mb-3 text-sm leading-relaxed text-muted">
+          şifreni değiştirdiğinde diğer cihazlardaki oturumların kapatılır.
+        </p>
+        <Link
+          href="/sifre-yenile"
+          className="inline-flex h-10 items-center rounded-md border border-line px-4 text-sm hover:bg-surface-2"
+        >
+          şifremi değiştir
+        </Link>
+      </SettingsSection>
+
       <SettingsSection title="özel mesajlar">
         <p className="text-sm leading-relaxed text-muted">
           {viewer.allow_messages

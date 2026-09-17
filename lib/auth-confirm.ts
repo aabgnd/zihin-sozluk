@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { YENILEME_COOKIE, YENILEME_SURESI } from "@/lib/recovery";
 
 type Cerez = { name: string; value: string; options: Record<string, unknown> };
 
@@ -45,10 +46,20 @@ export async function confirmEmail(request: NextRequest) {
     },
   );
 
-  function yonlendir(hedef: string) {
+  function yonlendir(hedef: string, yenilemeIzni = false) {
     const response = NextResponse.redirect(new URL(hedef, request.url));
     for (const { name, value, options } of yazilacakCerezler) {
       response.cookies.set(name, value, options);
+    }
+    // Yalnızca yenileme bağlantısıyla gelene "mevcut şifreyi sorma" izni ver.
+    if (yenilemeIzni) {
+      response.cookies.set(YENILEME_COOKIE, "1", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: YENILEME_SURESI,
+      });
     }
     return response;
   }
@@ -71,12 +82,12 @@ export async function confirmEmail(request: NextRequest) {
         type,
         token_hash: tokenHash,
       });
-      if (!error) return yonlendir(varisYeri);
+      if (!error) return yonlendir(varisYeri, type === "recovery");
     }
 
     if (code) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
-      if (!error) return yonlendir(varisYeri);
+      if (!error) return yonlendir(varisYeri, type === "recovery");
 
       // Buraya code ile gelindiyse Supabase e-postayı zaten onaylamıştır:
       // /auth/v1/verify önce doğrular, sonra bu adrese yönlendirir. Başarısız

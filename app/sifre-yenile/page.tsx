@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { YENILEME_COOKIE } from "@/lib/recovery";
 import { getViewer } from "@/lib/viewer";
 import NewPasswordForm from "./NewPasswordForm";
 
@@ -9,8 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default async function ResetPasswordPage() {
-  // Buraya yalnızca yenileme bağlantısıyla açılan oturumla gelinir.
   const viewer = await getViewer();
+  const cookieStore = await cookies();
+  // Yalnızca sunucuda yazılan httpOnly çerez sayılır.
+  const yenilemeIzni = cookieStore.get(YENILEME_COOKIE)?.value === "1";
 
   if (!viewer) {
     return (
@@ -34,12 +38,24 @@ export default async function ResetPasswordPage() {
 
   return (
     <section className="mx-auto max-w-sm py-4">
-      <h1 className="mb-5 text-2xl font-bold">şifre yenile</h1>
+      <h1 className="mb-5 text-2xl font-bold">
+        {yenilemeIzni ? "şifre yenile" : "şifreni değiştir"}
+      </h1>
       <p className="mb-4 text-sm leading-relaxed text-muted">
         <span className="font-semibold text-ink">{viewer.username}</span> için
         yeni bir şifre belirle.
+        {!yenilemeIzni && " güvenlik için önce mevcut şifreni yaz."}
       </p>
-      <NewPasswordForm />
+      <NewPasswordForm mevcutGerekli={!yenilemeIzni} />
+      <p className="mt-6 text-sm text-muted">
+        şifreni hatırlamıyor musun?{" "}
+        <Link
+          href="/sifremi-unuttum"
+          className="font-semibold text-gold-ink hover:underline"
+        >
+          e-postana bağlantı gönderelim
+        </Link>
+      </p>
     </section>
   );
 }

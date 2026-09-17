@@ -5,7 +5,11 @@ import { updatePassword } from "@/app/auth/actions";
 import Field from "@/components/Field";
 import type { FormState } from "@/lib/types";
 
-export default function NewPasswordForm() {
+export default function NewPasswordForm({
+  mevcutGerekli,
+}: {
+  mevcutGerekli: boolean;
+}) {
   const [state, formAction, pending] = useActionState<FormState, FormData>(
     updatePassword,
     {},
@@ -13,6 +17,15 @@ export default function NewPasswordForm() {
 
   return (
     <form action={formAction} className="space-y-4">
+      {mevcutGerekli && (
+        <Field
+          label="mevcut şifren"
+          name="mevcut_sifre"
+          type="password"
+          autoComplete="current-password"
+          required
+        />
+      )}
       <Field
         label="yeni şifre (en az 8 karakter)"
         name="password"
@@ -41,6 +54,9 @@ export default function NewPasswordForm() {
       >
         {pending ? "kaydediliyor…" : "şifremi değiştir"}
       </button>
+      <p className="text-xs leading-relaxed text-muted">
+        şifren değişince diğer cihazlardaki oturumların kapatılır.
+      </p>
     </form>
   );
 }
