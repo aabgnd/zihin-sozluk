@@ -134,7 +134,8 @@ export async function requestPasswordReset(
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${await siteUrl()}/auth/confirm?next=/sifre-yenile`,
+    // Hedef adresin kendisinde; sorgu parametresine güvenilmiyor.
+    redirectTo: `${await siteUrl()}/auth/sifre-yenile`,
   });
 
   return ayniCevap;
