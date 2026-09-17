@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { TopicListItem } from "@/lib/types";
+import TopicLink from "./TopicLink";
 
 export default function TopicList({
   topics,
@@ -16,9 +16,10 @@ export default function TopicList({
     <ul>
       {topics.map((topic) => (
         <li key={topic.slug} className="border-b border-line last:border-b-0">
-          <Link
-            href={`/baslik/${topic.slug}`}
+          <TopicLink
+            slug={topic.slug}
             className="flex min-h-12 items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
+            activeClassName="font-semibold text-logo"
           >
             <span className="break-words leading-snug">{topic.title}</span>
             <span className="ml-auto flex shrink-0 items-baseline gap-2 text-xs">
@@ -31,7 +32,7 @@ export default function TopicList({
                 )}
               <span className="text-muted">{topic.entry_count}</span>
             </span>
-          </Link>
+          </TopicLink>
         </li>
       ))}
     </ul>

@@ -104,7 +104,8 @@ export default async function TopicPage({
       />
 
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h1 className="break-words text-2xl font-bold leading-snug">
+        {/* Açık başlık, listelerdeki aktif başlıkla aynı sarıda. */}
+        <h1 className="break-words text-2xl font-bold leading-snug text-logo">
           {topic.title}
         </h1>
         {viewer?.isStaff && (

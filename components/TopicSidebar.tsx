@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getAgendaTopics, getYesterdayTop } from "@/lib/topics";
 import type { TopEntry, TopicListItem } from "@/lib/types";
 import SidebarTabs from "./SidebarTabs";
+import TopicLink from "./TopicLink";
 
 export default async function TopicSidebar() {
   const [topics, topRated] = await Promise.all([
@@ -26,15 +26,16 @@ function AgendaList({ topics }: { topics: TopicListItem[] }) {
     <ul>
       {topics.map((topic) => (
         <li key={topic.slug}>
-          <Link
-            href={`/baslik/${topic.slug}`}
+          <TopicLink
+            slug={topic.slug}
             className="flex items-start justify-between gap-3 rounded-md px-2 py-2.5 text-sm leading-snug text-ink hover:bg-surface-2"
+            activeClassName="font-semibold text-logo"
           >
             <span className="break-words">{topic.title}</span>
             <span className="shrink-0 pt-0.5 text-xs text-muted">
               {topic.entry_count}
             </span>
-          </Link>
+          </TopicLink>
         </li>
       ))}
     </ul>
@@ -50,9 +51,11 @@ function TopRatedList({ entries }: { entries: TopEntry[] }) {
     <ul>
       {entries.map((entry) => (
         <li key={entry.entry_id}>
-          <Link
+          <TopicLink
+            slug={entry.topic_slug}
             href={`/baslik/${entry.topic_slug}#entry-${entry.entry_id}`}
             className="block rounded-md px-2 py-2.5 hover:bg-surface-2"
+            activeClassName="font-semibold text-logo"
           >
             <span className="flex items-baseline justify-between gap-3">
               <span className="break-words text-sm">{entry.topic_title}</span>
@@ -63,7 +66,7 @@ function TopRatedList({ entries }: { entries: TopEntry[] }) {
             <span className="mt-0.5 line-clamp-2 block break-words text-xs text-muted">
               {entry.snippet}
             </span>
-          </Link>
+          </TopicLink>
         </li>
       ))}
     </ul>
