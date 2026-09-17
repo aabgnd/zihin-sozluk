@@ -4,29 +4,53 @@ import TopicList from "@/components/TopicList";
 import { ENTRY_SELECT, getViewerEntryState } from "@/lib/entries";
 import { createClient } from "@/lib/supabase/server";
 import { firstParam, istanbulDay } from "@/lib/text";
-import { AGENDA_PAGE_SIZE, getAgendaPage } from "@/lib/topics";
+import {
+  AGENDA_MAX_PAGES,
+  AGENDA_PAGE_SIZE,
+  getAgendaPage,
+} from "@/lib/topics";
 import type { EntryRow, TopicListItem } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const params = await searchParams;
   const list = firstParam(params.liste);
-  const page = Math.max(1, Math.trunc(Number(firstParam(params.sayfa))) || 1);
+  // Listeler iki sayfayla sınırlı; elle yazılan büyük sayfa numarası son
+  // sayfaya sabitlenir, boş liste gösterilmez.
+  const page = Math.min(
+    AGENDA_MAX_PAGES,
+    Math.max(1, Math.trunc(Number(firstParam(params.sayfa))) || 1),
+  );
   const supabase = await createClient();
 
   if (list === "bugun" || list === "dun") {
     const day = istanbulDay(list === "bugun" ? 0 : -1);
     const { data } = await supabase.rpc("topics_for_day", { day: day.iso });
+
+    // Gün listeleri de en çok iki sayfa.
+    const tavan = AGENDA_PAGE_SIZE * AGENDA_MAX_PAGES;
+    const hepsi = ((data ?? []) as TopicListItem[]).slice(0, tavan);
+    const pageCount = Math.max(1, Math.ceil(hepsi.length / AGENDA_PAGE_SIZE));
+    const sayfa = Math.min(page, pageCount);
+    const basla = (sayfa - 1) * AGENDA_PAGE_SIZE;
+
     return (
       <TopicSection
         heading={`${day.label} başlıkları`}
-        topics={(data ?? []) as TopicListItem[]}
+        topics={hepsi.slice(basla, basla + AGENDA_PAGE_SIZE)}
         empty={
           list === "bugun"
             ? "bugün henüz entry girilmedi."
             : "dün entry girilmemiş."
         }
-      />
+      >
+        <PageNumbers
+          basePath="/"
+          query={{ liste: list }}
+          page={sayfa}
+          pageCount={pageCount}
+        />
+      </TopicSection>
     );
   }
 

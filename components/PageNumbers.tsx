@@ -6,12 +6,21 @@ export default function PageNumbers({
   basePath,
   page,
   pageCount,
+  query,
 }: {
   basePath: string;
   page: number;
   pageCount: number;
+  /** Sayfa numarasının yanında korunacak parametreler (ör. liste=bugun). */
+  query?: Record<string, string>;
 }) {
   if (pageCount <= 1) return null;
+
+  const adres = (sayfa: number) => {
+    const params = new URLSearchParams(query);
+    params.set("sayfa", String(sayfa));
+    return `${basePath}?${params.toString()}`;
+  };
 
   const pages: number[] = [];
   for (let candidate = 1; candidate <= pageCount; candidate++) {
@@ -36,7 +45,7 @@ export default function PageNumbers({
             </span>
           ) : (
             <Link
-              href={`${basePath}?sayfa=${candidate}`}
+              href={adres(candidate)}
               className={`${box} border border-line text-ink hover:bg-surface-2`}
             >
               {candidate}

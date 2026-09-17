@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import Avatar from "@/components/Avatar";
-import DeletableRow from "@/components/DeletableRow";
 import LiveRefresh from "@/components/LiveRefresh";
-import LocalTime from "@/components/LocalTime";
 import { MESSAGE_COLUMNS } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
 import type { MessageRow } from "@/lib/types";
 import { getViewer } from "@/lib/viewer";
-import { deleteConversation } from "./actions";
+import ConversationList, { type Konusma } from "./ConversationList";
 
 export const metadata: Metadata = { title: "mesajlar" };
 
@@ -53,6 +49,21 @@ export default async function MessagesPage() {
     ((peopleData ?? []) as Person[]).map((person) => [person.id, person]),
   );
 
+  const konusmalar: Konusma[] = [];
+  for (const [otherId, { last, unread }] of conversations) {
+    const person = people.get(otherId);
+    if (!person) continue;
+    konusmalar.push({
+      otherId,
+      username: person.username,
+      avatarUrl: person.avatar_url,
+      sonMetin: last.content,
+      sonTarih: last.created_at,
+      benimMi: last.sender_id === viewer.id,
+      okunmamis: unread,
+    });
+  }
+
   return (
     <section>
       <LiveRefresh
@@ -63,65 +74,7 @@ export default async function MessagesPage() {
         ]}
       />
       <h1 className="border-b border-line pb-3 text-2xl font-bold">mesajlar</h1>
-
-      {conversations.size === 0 ? (
-        <p className="py-4 leading-relaxed text-muted">
-          {
-            "henüz mesajın yok. bir yazarın profilinden ya da entry'sinin altındaki menüden yazışmaya başlayabilirsin."
-          }
-        </p>
-      ) : (
-        <ul>
-          {[...conversations.entries()].map(([otherId, { last, unread }]) => {
-            const person = people.get(otherId);
-            if (!person) return null;
-            return (
-              <li key={otherId} className="border-b border-line">
-                <DeletableRow
-                  action={deleteConversation.bind(null, otherId)}
-                  ariaLabel={`${person.username} ile olan konuşmayı sil`}
-                  title="bu konuşma silinsin mi?"
-                  description="yazışma yalnızca senin tarafında silinir, karşı taraf kendi kopyasını görmeye devam eder."
-                  className="flex items-center gap-1"
-                >
-                  <Link
-                    href={`/mesajlar/${encodeURIComponent(person.username)}`}
-                    className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-3 hover:bg-surface-2"
-                  >
-                    <Avatar
-                      username={person.username}
-                      url={person.avatar_url}
-                      size="md"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span
-                          className={`break-words ${unread > 0 ? "font-bold" : "font-semibold"}`}
-                        >
-                          {person.username}
-                        </span>
-                        <LocalTime
-                          iso={last.created_at}
-                          className="shrink-0 text-xs text-muted"
-                        />
-                      </div>
-                      <p className="line-clamp-1 break-all text-sm text-muted">
-                        {last.sender_id === viewer.id ? "sen: " : ""}
-                        {last.content}
-                      </p>
-                    </div>
-                    {unread > 0 && (
-                      <span className="shrink-0 rounded-full bg-alert px-2 py-0.5 text-xs font-bold text-on-alert">
-                        {unread}
-                      </span>
-                    )}
-                  </Link>
-                </DeletableRow>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <ConversationList konusmalar={konusmalar} />
     </section>
   );
 }

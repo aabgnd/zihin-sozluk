@@ -39,17 +39,6 @@ export async function sendMessage(
   return {};
 }
 
-/** Tek mesaji yalnizca silen kisinin tarafinda gizler. */
-export async function deleteMessage(id: number) {
-  const viewer = await getViewer();
-  if (!viewer) redirect("/giris");
-
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("delete_message", { target: id });
-  if (error) throw new Error("mesaj silinemedi");
-
-  revalidatePath("/", "layout");
-}
 
 /** Bir kisiyle olan tum yazismayi yalnizca silen kisinin tarafinda gizler. */
 export async function deleteConversation(otherId: string) {
@@ -61,6 +50,60 @@ export async function deleteConversation(otherId: string) {
     other: otherId,
   });
   if (error) throw new Error("konuşma silinemedi");
+
+  revalidatePath("/", "layout");
+}
+
+/** Secilen konusmalari, yalnizca silen kisinin tarafinda gizler. */
+export async function deleteConversations(otherIds: string[]) {
+  const viewer = await getViewer();
+  if (!viewer) redirect("/giris");
+  if (otherIds.length === 0) return;
+
+  const supabase = await createClient();
+  const sonuclar = await Promise.all(
+    otherIds.map((id) => supabase.rpc("delete_conversation", { other: id })),
+  );
+  if (sonuclar.some((sonuc) => sonuc.error)) {
+    throw new Error("konuşmalar silinemedi");
+  }
+
+  revalidatePath("/", "layout");
+}
+
+/** Tum yazismalari, yalnizca silen kisinin tarafinda gizler. */
+export async function deleteAllConversations() {
+  const viewer = await getViewer();
+  if (!viewer) redirect("/giris");
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("messages")
+    .select("sender_id, receiver_id")
+    .or(
+      `and(sender_id.eq.${viewer.id},sender_deleted_at.is.null),and(receiver_id.eq.${viewer.id},receiver_deleted_at.is.null)`,
+    )
+    .limit(2000);
+
+  const partnerler = new Set<string>();
+  for (const mesaj of (data ?? []) as {
+    sender_id: string;
+    receiver_id: string;
+  }[]) {
+    partnerler.add(
+      mesaj.sender_id === viewer.id ? mesaj.receiver_id : mesaj.sender_id,
+    );
+  }
+  if (partnerler.size === 0) return;
+
+  const sonuclar = await Promise.all(
+    [...partnerler].map((id) =>
+      supabase.rpc("delete_conversation", { other: id }),
+    ),
+  );
+  if (sonuclar.some((sonuc) => sonuc.error)) {
+    throw new Error("mesajlar silinemedi");
+  }
 
   revalidatePath("/", "layout");
 }

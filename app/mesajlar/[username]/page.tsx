@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import ConfirmButton from "@/components/ConfirmButton";
-import DeletableRow from "@/components/DeletableRow";
 import LiveRefresh from "@/components/LiveRefresh";
 import LocalTime from "@/components/LocalTime";
 import MarkRead from "@/components/MarkRead";
@@ -15,7 +14,6 @@ import type { MessageRow, PublicProfile } from "@/lib/types";
 import { getViewer, PROFILE_COLUMNS } from "@/lib/viewer";
 import {
   deleteConversation,
-  deleteMessage,
   markConversationRead,
   sendMessage,
 } from "../actions";
@@ -114,33 +112,26 @@ export default async function ConversationPage({
         )}
         {messages.map((message) => {
           const mine = message.sender_id === viewer.id;
+          // Tek tek silme yok: her balonun yanında çöp kutusu durması okumayı
+          // zorlaştırıyordu. Silme konuşma bütününde yapılır.
           return (
-            <li key={message.id}>
-              <DeletableRow
-                action={deleteMessage.bind(null, message.id)}
-                ariaLabel="bu mesajı sil"
-                title="bu mesaj silinsin mi?"
-                description="mesaj yalnızca senin tarafında silinir, karşı taraf kendi kopyasını görmeye devam eder."
-                className={`flex items-center gap-1 ${
-                  mine
-                    ? "flex-row-reverse justify-start"
-                    : "flex-row justify-start"
+            <li
+              key={message.id}
+              className={`flex ${mine ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
+                  mine ? "bg-gold/15" : "bg-surface-2"
                 }`}
               >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
-                    mine ? "bg-gold/15" : "bg-surface-2"
-                  }`}
-                >
-                  <p className="whitespace-pre-line break-words text-[15px] leading-6">
-                    {message.content}
-                  </p>
-                  <p className="mt-1 text-right text-[11px] text-muted">
-                    <LocalTime iso={message.created_at} />
-                    {mine && message.is_read && " · okundu"}
-                  </p>
-                </div>
-              </DeletableRow>
+                <p className="whitespace-pre-line break-words text-[15px] leading-6">
+                  {message.content}
+                </p>
+                <p className="mt-1 text-right text-[11px] text-muted">
+                  <LocalTime iso={message.created_at} />
+                  {mine && message.is_read && " · okundu"}
+                </p>
+              </div>
             </li>
           );
         })}
