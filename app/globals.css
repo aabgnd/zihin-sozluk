@@ -89,6 +89,27 @@
 /* Sayfa kısa kaldığında altta beyaz şerit kalmasın. */
 html {
   background-color: var(--page);
+  /* Yatay taşma olmasa bile kenarda yaşanan yana sürüklenmeyi keser. */
+  overscroll-behavior-x: none;
+}
+
+/*
+ * Mobilde form alanları en az 16px.
+ *
+ * iOS ve Android, yazı boyutu 16px'in altında olan bir alana odaklanıldığında
+ * sayfayı otomatik yakınlaştırır. Yakınlaşan sayfa ekrandan geniş kaldığı için
+ * parmakla sağa sola kayar ve bir daha kendi başına eski haline dönmez.
+ * Sorunun kaynağı düzen taşması değil, bu otomatik yakınlaştırmaydı.
+ *
+ * Kural katmansız yazıldı: Tailwind yardımcıları @layer içinde olduğu için
+ * katmansız kurallar onları geçer, yoksa text-[15px] baskın gelirdi.
+ */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 a,

@@ -68,8 +68,9 @@ export default async function SiteHeader() {
             </MobileAgendaDrawer>
           </div>
 
+          {/* Üyeler bugüne, ziyaretçiler gündeme gider. */}
           <Link
-            href="/"
+            href={viewer ? "/?liste=bugun" : "/"}
             aria-label="zihin sözlük ana sayfa"
             className="shrink-0 whitespace-nowrap text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
           >
