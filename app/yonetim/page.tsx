@@ -59,6 +59,23 @@ type UserEntry = {
 };
 
 const row = "border-b border-line py-4";
+
+/** Yazarlık eşiği. Sunucudaki writer_entry_threshold() ile aynı olmalı. */
+const WRITER_THRESHOLD = 5;
+
+/**
+ * Admin hesabı ve kişinin kendi hesabı moderasyon işlemlerinden muaftır.
+ * Sunucu tarafı aynı kuralı zaten uyguluyor (mod_guard_target); buradaki
+ * kontrol çalışmayacak düğmeleri hiç göstermemek için.
+ */
+function korumali(user: ModUser, viewerId: string) {
+  return user.role === "admin" || user.id === viewerId;
+}
+
+/** Eşik dolmadan yazarlığı yalnızca admin verebilir. */
+function yazarYapilabilir(user: ModUser, viewerRole: Role) {
+  return viewerRole === "admin" || user.entry_count >= WRITER_THRESHOLD;
+}
 const smallButton =
   "h-9 rounded-md border border-line px-3 text-xs hover:bg-surface-2";
 const dangerButton =
@@ -116,7 +133,11 @@ export default async function ModerationPage({
       {tab === "sikayetler" && <ReportsTab />}
       {tab === "yazarlik" && <PendingWritersTab />}
       {tab === "kullanicilar" && (
-        <UsersTab search={search} viewerRole={viewer.role} />
+        <UsersTab
+          search={search}
+          viewerRole={viewer.role}
+          viewerId={viewer.id}
+        />
       )}
       {tab === "cop" && <TrashTab isAdmin={viewer.role === "admin"} />}
       {tab === "kayit" && <LogTab />}
@@ -292,9 +313,11 @@ async function PendingWritersTab() {
 async function UsersTab({
   search,
   viewerRole,
+  viewerId,
 }: {
   search: string;
   viewerRole: Role;
+  viewerId: string;
 }) {
   const supabase = await createClient();
   const { data } = await supabase.rpc("mod_list_users", { search });
@@ -361,6 +384,13 @@ async function UsersTab({
                   {formatDate(user.created_at)}
                 </p>
 
+                {korumali(user, viewerId) ? (
+                  <p className="mt-3 text-xs text-muted">
+                    {user.role === "admin"
+                      ? "admin hesabı: bu hesap üzerinde işlem yapılamaz."
+                      : "kendi hesabın: bu hesap üzerinde işlem yapılamaz."}
+                  </p>
+                ) : (
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <MuteForm userId={user.id} />
                   {muted && (
@@ -368,15 +398,23 @@ async function UsersTab({
                       susturmayı kaldır
                     </ActionButton>
                   )}
-                  <ActionButton
-                    action={modSetStatus.bind(
-                      null,
-                      user.id,
-                      user.status === "yazar" ? "caylak" : "yazar",
-                    )}
-                  >
-                    {user.status === "yazar" ? "çaylaklığa düşür" : "yazar yap"}
-                  </ActionButton>
+                  {user.status === "yazar" ? (
+                    <ActionButton
+                      action={modSetStatus.bind(null, user.id, "caylak")}
+                    >
+                      çaylaklığa düşür
+                    </ActionButton>
+                  ) : yazarYapilabilir(user, viewerRole) ? (
+                    <ActionButton
+                      action={modSetStatus.bind(null, user.id, "yazar")}
+                    >
+                      yazar yap
+                    </ActionButton>
+                  ) : (
+                    <span className="text-xs text-muted">
+                      {`yazar yapmak için ${WRITER_THRESHOLD} entry gerekiyor (${user.entry_count} var); eşik dolmadan yalnızca admin yapabilir.`}
+                    </span>
+                  )}
                   <ActionButton
                     action={modSetAccount.bind(
                       null,
@@ -410,6 +448,7 @@ async function UsersTab({
                     </ActionButton>
                   )}
                 </div>
+                )}
               </li>
             );
           })}
