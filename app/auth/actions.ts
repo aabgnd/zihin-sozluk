@@ -82,10 +82,29 @@ export async function signIn(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const email = String(formData.get("email") ?? "").trim();
+  const kimlik = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
+  let email = kimlik;
+
+  // İçinde @ yoksa kullanıcı adı sayılır. E-posta sunucuda çözülür ve
+  // yalnızca şifre doğruysa döner; aksi hâlde kullanıcı adlarını tarayıp
+  // herkesin e-postasını toplamak mümkün olurdu.
+  if (kimlik && !kimlik.includes("@")) {
+    const { data, error: rpcHatasi } = await supabase.rpc("kullanici_email", {
+      kullanici: kimlik.toLocaleLowerCase("tr"),
+      sifre: password,
+    });
+    if (rpcHatasi) {
+      return {
+        error: "kullanıcı adıyla giriş şu an yapılamıyor. e-postanla dene.",
+      };
+    }
+    if (!data) return { error: AUTH_ERRORS.invalid_credentials };
+    email = String(data);
+  }
+
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
     return error.code === "email_not_confirmed"

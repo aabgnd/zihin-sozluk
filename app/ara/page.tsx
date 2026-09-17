@@ -26,6 +26,21 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
   const slug = slugify(query);
   const supabase = await createClient();
 
+  // "@nick" doğrudan yazarın profiline gider. @ olmadan yazılan aynı metin
+  // başlık araması sayılır.
+  if (query.startsWith("@")) {
+    const kullanici = query.slice(1).trim();
+    if (kullanici) {
+      const { data: yazar } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", kullanici)
+        .maybeSingle();
+      if (yazar) redirect(`/yazar/${encodeURIComponent(yazar.username)}`);
+    }
+    return <YazarYok kullanici={kullanici} />;
+  }
+
   if (slug) {
     const { data: existing } = await supabase
       .from("topic_stats")
@@ -70,6 +85,29 @@ export default async function SearchPage({ searchParams }: PageProps<"/ara">) {
           <TopicList topics={similar} empty="" />
         </section>
       )}
+    </section>
+  );
+}
+
+function YazarYok({ kullanici }: { kullanici: string }) {
+  return (
+    <section>
+      <header className="border-b border-line pb-3">
+        <h1 className="break-words text-2xl font-bold leading-snug">
+          @{kullanici}
+        </h1>
+        <p className="mt-1 text-sm text-muted">böyle bir yazar yok.</p>
+      </header>
+      <p className="py-5 text-sm leading-relaxed text-muted">
+        yazar aramak için başına @ koy. başlık aramak istiyorsan{" "}
+        <Link
+          href={`/ara?q=${encodeURIComponent(kullanici)}`}
+          className="font-semibold text-gold-ink hover:underline"
+        >
+          {kullanici}
+        </Link>{" "}
+        diye ara.
+      </p>
     </section>
   );
 }

@@ -19,10 +19,10 @@ export default function LoginForm() {
     <>
       <form action={formAction} className="space-y-4">
         <Field
-          label="e-posta"
+          label="e-posta ya da kullanıcı adı"
           name="email"
-          type="email"
-          autoComplete="email"
+          type="text"
+          autoComplete="username"
           required
         />
         <Field
