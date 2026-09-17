@@ -8,7 +8,13 @@ import ConfirmButton from "./ConfirmButton";
 import EntryMenu from "./EntryMenu";
 import EntryText from "./EntryText";
 import ExpandableText from "./ExpandableText";
-import { ChevronDownIcon, ChevronUpIcon, HeartIcon, ShareIcon } from "./icons";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EnvelopeIcon,
+  HeartIcon,
+  ShareIcon,
+} from "./icons";
 import RankBadge from "./RankBadge";
 import ReportButton from "./ReportButton";
 
@@ -40,6 +46,15 @@ export default function EntryCard({
   const { author } = entry;
   const isOwnEntry = Boolean(viewerId && author && author.id === viewerId);
   const otherUsersEntry = Boolean(viewerId && author && author.id !== viewerId);
+  /*
+   * Zarf ve menüdeki "mesaj gönder" aynı adrese gider ve entry referansını
+   * kendiliğinden taşır. Kendi entry'sinde görünmez. Çıkış yapmış kullanıcı
+   * basarsa mesaj sayfası giriş sayfasına yönlendirir.
+   */
+  const mesajAdresi =
+    author && !isOwnEntry
+      ? `/mesajlar/${encodeURIComponent(author.username)}?entry=${entry.id}`
+      : null;
   const entryHref = entry.topic
     ? `/baslik/${entry.topic.slug}#entry-${entry.id}`
     : "";
@@ -117,6 +132,17 @@ export default function EntryCard({
             </Link>
           )}
 
+          {mesajAdresi && (
+            <Link
+              href={mesajAdresi}
+              aria-label="mesaj gönder"
+              title="mesaj gönder"
+              className="grid size-9 place-items-center rounded-md text-muted hover:bg-surface-2 hover:text-ink"
+            >
+              <EnvelopeIcon className="size-4" />
+            </Link>
+          )}
+
           <EntryMenu entryHref={entryHref}>
             {otherUsersEntry && (
               <ReportButton entryId={entry.id} className={entryMenuItem} />
@@ -148,13 +174,9 @@ export default function EntryCard({
                 className={`${entryMenuItem} text-danger`}
               />
             )}
-            {otherUsersEntry && author?.allow_messages && (
-              <Link
-                href={`/mesajlar/${encodeURIComponent(author.username)}`}
-                role="menuitem"
-                className={entryMenuItem}
-              >
-                mesaj at
+            {mesajAdresi && (
+              <Link href={mesajAdresi} role="menuitem" className={entryMenuItem}>
+                mesaj gönder
               </Link>
             )}
           </EntryMenu>

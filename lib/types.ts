@@ -2,6 +2,8 @@ export type FormState = {
   error?: string;
   message?: string;
   unconfirmedEmail?: string;
+  /** Mesaj gönderildi: form temizlenip referans kartı kaldırılsın. */
+  sent?: boolean;
 };
 
 export type FormAction = (

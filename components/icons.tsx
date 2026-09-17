@@ -196,6 +196,16 @@ export function ArrowUpIcon({ className }: IconProps) {
   );
 }
 
+// Mektup zarfı: mesaj balonundan (MessageIcon) ayrı bir işi anlatır.
+export function EnvelopeIcon({ className }: IconProps) {
+  return (
+    <svg {...solid} className={className}>
+      <path d="M3.2 7.4 12 13l8.8-5.6A2 2 0 0 0 19 6.2H5a2 2 0 0 0-1.8 1.2Z" />
+      <path d="M3 9.4v8.4A2 2 0 0 0 5 19.8h14a2 2 0 0 0 2-2V9.4l-8.5 5.4a1 1 0 0 1-1 0L3 9.4Z" />
+    </svg>
+  );
+}
+
 export function TrashIcon({ className }: IconProps) {
   return (
     <svg {...solid} className={className}>

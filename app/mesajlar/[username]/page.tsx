@@ -7,9 +7,16 @@ import LiveRefresh from "@/components/LiveRefresh";
 import LocalTime from "@/components/LocalTime";
 import MarkRead from "@/components/MarkRead";
 import ScrollAnchor from "@/components/ScrollAnchor";
-import { getMessageBlocker, MESSAGE_COLUMNS } from "@/lib/messages";
+import MessageRefCard from "@/components/MessageRefCard";
+import { referanslariBagla } from "@/components/entry-refs";
+import {
+  getEntryRefs,
+  getMessageBlocker,
+  getMessageEntryIds,
+  MESSAGE_COLUMNS,
+} from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
-import { safeDecode } from "@/lib/text";
+import { firstParam, safeDecode } from "@/lib/text";
 import type { MessageRow, PublicProfile } from "@/lib/types";
 import { getViewer, PROFILE_COLUMNS } from "@/lib/viewer";
 import {
@@ -23,10 +30,16 @@ export const metadata: Metadata = { title: "sohbet" };
 
 export default async function ConversationPage({
   params,
+  searchParams,
 }: PageProps<"/mesajlar/[username]">) {
   const viewer = await getViewer();
   if (!viewer) redirect("/giris");
 
+  // Entry'den zarfa basılarak gelindiyse referans buradan okunur; kullanıcı
+  // numara yazmak zorunda kalmaz.
+  const istenenEntry = Math.trunc(
+    Number(firstParam((await searchParams).entry)),
+  );
   const username = safeDecode((await params).username);
   const supabase = await createClient();
   const { data } = await supabase
@@ -55,6 +68,20 @@ export default async function ConversationPage({
     (message) => message.receiver_id === viewer.id && !message.is_read,
   );
   const lastUnread = unread.at(-1);
+
+  const yeniReferans =
+    Number.isSafeInteger(istenenEntry) && istenenEntry > 0
+      ? istenenEntry
+      : null;
+
+  // Hangi mesaj hangi entry'ye referans veriyor, sonra o entry'lerin kartları.
+  const mesajReferanslari = await getMessageEntryIds(
+    messages.map((message) => message.id),
+  );
+  const referanslar = await getEntryRefs([
+    ...mesajReferanslari.values(),
+    ...(yeniReferans ? [yeniReferans] : []),
+  ]);
 
   return (
     <section>
@@ -124,8 +151,22 @@ export default async function ConversationPage({
                   mine ? "bg-gold/15" : "bg-surface-2"
                 }`}
               >
+                {/* Referans metnin üstünde; yazar hangi entry'sine yazıldığını
+                    mesajı okumadan görsün. */}
+                {(() => {
+                  const entryId = mesajReferanslari.get(message.id);
+                  const referans = entryId
+                    ? referanslar.get(entryId)
+                    : undefined;
+                  if (!referans) return null;
+                  return (
+                    <div className="mb-2">
+                      <MessageRefCard referans={referans} />
+                    </div>
+                  );
+                })()}
                 <p className="whitespace-pre-line break-words text-[15px] leading-6">
-                  {message.content}
+                  {referanslariBagla(message.content, `msj${message.id}`)}
                 </p>
                 <p className="mt-1 text-right text-[11px] text-muted">
                   <LocalTime iso={message.created_at} />
@@ -143,7 +184,10 @@ export default async function ConversationPage({
           {blocker}
         </p>
       ) : (
-        <MessageForm action={sendMessage.bind(null, other.id)} />
+        <MessageForm
+          action={sendMessage.bind(null, other.id)}
+          referans={yeniReferans ? (referanslar.get(yeniReferans) ?? null) : null}
+        />
       )}
     </section>
   );

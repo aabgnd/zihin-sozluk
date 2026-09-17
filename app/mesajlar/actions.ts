@@ -22,11 +22,30 @@ export async function sendMessage(
   if (content.length > 5000)
     return { error: "mesaj en fazla 5.000 karakter olabilir." };
 
+  // Referans mesajın kendi verisinde durur, metnine yazılmaz; entry
+  // sonradan düzenlense de bozulmaz.
+  const ham = String(formData.get("entry_id") ?? "").trim();
+  const entryId = ham ? Math.trunc(Number(ham)) : null;
+  if (ham && (!Number.isSafeInteger(entryId) || (entryId ?? 0) < 1)) {
+    return { error: "entry referansı geçersiz." };
+  }
+
   const supabase = await createClient();
-  const { error } = await supabase
+  const temel = { sender_id: viewer.id, receiver_id: receiverId, content };
+  let { error } = await supabase
     .from("messages")
-    .insert({ sender_id: viewer.id, receiver_id: receiverId, content });
+    .insert({ ...temel, entry_id: entryId });
+
+  // 014 migration'ı çalıştırılmadıysa entry_id kolonu yoktur. Mesajın
+  // gitmemesi yerine referanssız gönderilir.
+  if (error?.code === "42703") {
+    ({ error } = await supabase.from("messages").insert(temel));
+  }
+
   if (error) {
+    if (error.code === "23503") {
+      return { error: "referans verilen entry bulunamadı." };
+    }
     return {
       error:
         error.code === "42501"
@@ -36,7 +55,7 @@ export async function sendMessage(
   }
 
   revalidatePath("/", "layout");
-  return {};
+  return { sent: true };
 }
 
 
