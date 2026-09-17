@@ -73,7 +73,7 @@ export default async function SettingsPage() {
           şifreni değiştirdiğinde diğer cihazlardaki oturumların kapatılır.
         </p>
         <Link
-          href="/sifre-yenile"
+          href="/sifre-yenile?kaynak=ayarlar"
           className="inline-flex h-10 items-center rounded-md border border-line px-4 text-sm hover:bg-surface-2"
         >
           şifremi değiştir

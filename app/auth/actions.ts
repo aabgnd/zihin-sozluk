@@ -165,8 +165,11 @@ export async function updatePassword(
   }
 
   // Bağlantıyla gelmeyen herkes mevcut şifresini bilmek zorunda: açık kalmış
-  // bir oturumu ele geçiren kişi şifreyi değiştirememeli.
-  if (!yenilemeIzni) {
+  // bir oturumu ele geçiren kişi şifreyi değiştirememeli. Ayarlardan gelen
+  // form ayrıca mevcut şifreyi açıkça ister; bu alan kontrolü yalnızca
+  // sıkılaştırabilir, gevşetemez.
+  const mevcutIstendi = String(formData.get("mevcut_istendi") ?? "") === "1";
+  if (!yenilemeIzni || mevcutIstendi) {
     const { data: kalan } = await supabase.rpc("sifre_kilit_kalan");
     if (typeof kalan === "number" && kalan > 0) {
       const dakika = Math.ceil(kalan / 60);

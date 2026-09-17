@@ -18,13 +18,18 @@ export default function NewPasswordForm({
   return (
     <form action={formAction} className="space-y-4">
       {mevcutGerekli && (
-        <Field
-          label="mevcut şifren"
-          name="mevcut_sifre"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
+        <>
+          {/* Sunucu da mevcut şifreyi istesin. Bu alan yalnızca kontrolü
+              sıkılaştırır, hiçbir durumda gevşetemez. */}
+          <input type="hidden" name="mevcut_istendi" value="1" />
+          <Field
+            label="mevcut şifren"
+            name="mevcut_sifre"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
+        </>
       )}
       <Field
         label="yeni şifre (en az 8 karakter)"
