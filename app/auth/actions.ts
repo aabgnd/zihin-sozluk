@@ -2,7 +2,7 @@
 
 import type { AuthError } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
-import { onayAdresi } from "@/lib/site-url";
+import { onayAdresi, siteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import type { FormState } from "@/lib/types";
 
@@ -111,6 +111,47 @@ export async function resendConfirmation(
   return {
     message: "onay e-postası tekrar gönderildi. gelen kutunu kontrol et.",
   };
+}
+
+/**
+ * Şifre yenileme bağlantısı ister.
+ *
+ * Adres kayıtlı olsun olmasın aynı cevabı döner; aksi hâlde form, hangi
+ * e-postaların sitede kayıtlı olduğunu öğrenmek için kullanılabilirdi.
+ */
+export async function requestPasswordReset(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const ayniCevap = {
+    message: "bu adres kayıtlıysa şifre yenileme bağlantısı gönderdik.",
+  };
+  if (!email) return { error: "e-posta adresini yaz." };
+
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${await siteUrl()}/auth/confirm?next=/sifre-yenile`,
+  });
+
+  return ayniCevap;
+}
+
+export async function updatePassword(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const password = String(formData.get("password") ?? "");
+  const tekrar = String(formData.get("password_tekrar") ?? "");
+
+  if (password.length < 8) return { error: "şifre en az 8 karakter olmalı." };
+  if (password !== tekrar) return { error: "şifreler birbirini tutmuyor." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return authError(error);
+
+  redirect("/");
 }
 
 export async function signOut() {

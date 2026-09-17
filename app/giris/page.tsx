@@ -48,7 +48,15 @@ export default async function LoginPage({ searchParams }: PageProps<"/giris">) {
         </div>
       )}
       <LoginForm />
-      <p className="mt-6 text-sm text-muted">
+      <p className="mt-4 text-sm">
+        <Link
+          href="/sifremi-unuttum"
+          className="font-semibold text-gold-ink hover:underline"
+        >
+          şifremi unuttum
+        </Link>
+      </p>
+      <p className="mt-2 text-sm text-muted">
         hesabın yok mu?{" "}
         <Link
           href="/kayit"

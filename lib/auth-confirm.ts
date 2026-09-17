@@ -53,6 +53,13 @@ export async function confirmEmail(request: NextRequest) {
     return response;
   }
 
+  const type = (params.get("type") as EmailOtpType | null) ?? "email";
+
+  // Şifre yenileme bağlantısı ölüyse kullanıcıyı giriş sayfasına değil, yeni
+  // bağlantı isteyebileceği sayfaya gönder.
+  const hataHedefi =
+    type === "recovery" ? "/sifremi-unuttum?hata=link" : "/giris?hata=onay";
+
   // Supabase bağlantıyı kendi tarafında reddettiyse (süresi dolmuş, kullanılmış)
   // denemeye gerek yok.
   if (!params.get("error") && !params.get("error_code")) {
@@ -60,7 +67,6 @@ export async function confirmEmail(request: NextRequest) {
     const code = params.get("code");
 
     if (tokenHash) {
-      const type = (params.get("type") as EmailOtpType | null) ?? "email";
       const { error } = await supabase.auth.verifyOtp({
         type,
         token_hash: tokenHash,
@@ -76,9 +82,10 @@ export async function confirmEmail(request: NextRequest) {
       // /auth/v1/verify önce doğrular, sonra bu adrese yönlendirir. Başarısız
       // olan tek şey bu tarayıcıda oturum açmak; doğrulayıcı çerez kayıt
       // olunan cihazda kaldı. Kullanıcıya hata değil, giriş davetiyesi.
-      return yonlendir("/giris?onay=tamam");
+      // Bu mantık yalnızca kayıt onayı için geçerli, şifre yenileme için değil.
+      return yonlendir(type === "recovery" ? hataHedefi : "/giris?onay=tamam");
     }
   }
 
-  return yonlendir("/giris?hata=onay");
+  return yonlendir(hataHedefi);
 }
