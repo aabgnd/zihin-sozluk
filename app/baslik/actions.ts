@@ -41,7 +41,11 @@ export async function createEntry(
   const { error } = await supabase
     .from("entries")
     .insert({ topic_id: topicId, user_id: viewer.id, content: entry.content });
-  if (error) return { error: "entry kaydedilemedi, tekrar dene." };
+  if (error) {
+    // Hız sınırı tetikleyicisi (015) kendi Türkçe mesajıyla gelir.
+    if (error.code === "ZS429") return { error: error.message };
+    return { error: "entry kaydedilemedi, tekrar dene." };
+  }
 
   revalidatePath("/", "layout");
   redirect(`/baslik/${slug}?sayfa=son`);
@@ -72,6 +76,7 @@ export async function createTopicWithEntry(
     entry_content: entry.content,
   });
   if (error) {
+    if (error.code === "ZS429") return { error: error.message };
     if (error.message.includes("çaylak")) {
       return {
         error: "yazar olduğunda yeni başlık açabilir ve mesaj gönderebilirsin.",

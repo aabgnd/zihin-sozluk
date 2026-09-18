@@ -43,6 +43,8 @@ export async function sendMessage(
   }
 
   if (error) {
+    // Hız sınırı tetikleyicisi (015) kendi Türkçe mesajıyla gelir.
+    if (error.code === "ZS429") return { error: error.message };
     if (error.code === "23503") {
       return { error: "referans verilen entry bulunamadı." };
     }
