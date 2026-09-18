@@ -108,7 +108,8 @@ export default function ZihinOzet({
               </span>
               <Link
                 href={`/baslik/${summary.top_topic_slug}`}
-                className="font-semibold text-gold-ink hover:underline"
+                // Küçük satır içi bağlantı: koyu yazı, sarı alt çizgi.
+                className="font-semibold text-ink underline decoration-gold decoration-2 underline-offset-4"
               >
                 {summary.top_topic_title}
               </Link>

@@ -6,12 +6,19 @@ export const RUTBE_ESIGI = 100;
 export const RUTBELER = ["çırak", "kalfa", "usta", "sanatçı"] as const;
 export type Rutbe = (typeof RUTBELER)[number];
 
-// Seviye yükseldikçe rozet daha gösterişli: çırak en sade, sanatçı dolu altın.
+/*
+ * Seviye yükseldikçe rozet belirginleşir: gri çerçeve → sarı çerçeve →
+ * yumuşak sarı dolgu → dolu sarı.
+ *
+ * Yazı her seviyede KOYU. Sarı yalnızca çerçeve ve dolgu olarak kullanılır;
+ * sarı yazı beyaz zeminde 1,61:1 ile okunmuyor, soluk sarı zemin üzerinde
+ * sarı yazı ise neredeyse hiç okunmuyordu (kalfa ve usta bu yüzden bozuktu).
+ */
 export const RUTBE_STILLERI: Record<Rutbe, string> = {
-  çırak: "border-line bg-page text-ink",
-  kalfa: "border-gold/60 bg-gold/20 text-gold-ink",
-  usta: "border-gold bg-gold/40 text-gold-ink",
-  sanatçı: "border-gold bg-gold text-on-gold shadow-sm",
+  çırak: "border-line text-muted",
+  kalfa: "border-gold text-ink",
+  usta: "border-gold bg-gold/25 text-ink",
+  sanatçı: "border-gold bg-gold text-on-gold",
 };
 
 export function rutbeSeviyesi(entryCount: number) {

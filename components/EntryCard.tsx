@@ -193,7 +193,9 @@ export default function EntryCard({
             <div className="flex flex-wrap items-center justify-end gap-1.5">
               <Link
                 href={`/yazar/${encodeURIComponent(author.username)}`}
-                className="text-sm font-semibold text-gold-ink hover:underline"
+                // İsim koyu; sarı yalnızca üzerine gelince alt çizgide.
+                // Sarı yazı rütbe rozetinin yanında soluk ve okunaksızdı.
+                className="text-sm font-semibold text-ink decoration-gold decoration-2 underline-offset-4 hover:underline"
               >
                 {author.username}
               </Link>
@@ -208,7 +210,9 @@ export default function EntryCard({
             <Link
               href={`/entry/${entry.id}`}
               aria-label={`entry ${entry.id} kalıcı bağlantısı`}
-              className="font-semibold text-gold-ink hover:underline"
+              // Numara bir üst bilgi, tarihle aynı sessizlikte; üzerine
+              // gelince belirginleşir.
+              className="hover:text-ink hover:underline decoration-gold underline-offset-2"
             >
               #{entry.id}
             </Link>

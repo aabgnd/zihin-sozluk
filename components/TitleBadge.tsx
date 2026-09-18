@@ -9,8 +9,10 @@ export default function TitleBadge({
   if (!generation || !title) return null;
 
   return (
-    // Dolgu yok: iki temada da sarı kenarlık + sarı yazı.
-    <span className="inline-block rounded-md border border-gold px-2 py-px text-[13px] font-bold lowercase text-gold-ink">
+    // Rütbe rozetlerinden ayrışsın diye yuvarlak ve başında sarı nokta var.
+    // Yazı koyu; sarı yazı beyaz zeminde okunmuyordu.
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/70 px-2.5 py-px text-[13px] font-semibold lowercase text-ink">
+      <span aria-hidden="true" className="size-1.5 rounded-full bg-gold" />
       {`${generation} – ${title}`.toLocaleLowerCase("tr")}
     </span>
   );
