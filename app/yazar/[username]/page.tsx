@@ -10,6 +10,7 @@ import RankBadge from "@/components/RankBadge";
 import TitleBadge from "@/components/TitleBadge";
 import UserList, { type UserListItem } from "@/components/UserList";
 import ZihinOzet, { type SummaryRow } from "@/components/ZihinOzet";
+import { getBio } from "@/lib/bio";
 import { ENTRY_SELECT, getViewerEntryState } from "@/lib/entries";
 import { rutbeBul, rutbeIlerlemesi } from "@/lib/rutbe";
 import { createClient } from "@/lib/supabase/server";
@@ -87,6 +88,7 @@ export default async function AuthorPage({
     summaryResult,
     followResult,
     blockResult,
+    bio,
   ] = await Promise.all([
     supabase.rpc("profile_stats", { target: profile.id }),
     supabase
@@ -110,6 +112,7 @@ export default async function AuthorPage({
           .eq("blocked_id", profile.id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
+    getBio(profile.id),
   ]);
 
   const stats = (
@@ -159,6 +162,11 @@ export default async function AuthorPage({
             {stats?.follower_count ?? 0} takipçi · katılım{" "}
             <LocalTime iso={profile.created_at} mode="date" />
           </p>
+          {bio && (
+            <p className="max-w-prose whitespace-pre-line break-words pt-1 text-[15px] leading-relaxed">
+              {bio}
+            </p>
+          )}
           {profile.is_banned && (
             <p className="text-sm font-semibold text-danger">
               bu yazar uçuruldu.

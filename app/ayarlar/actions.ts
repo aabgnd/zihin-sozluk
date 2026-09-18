@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { BIO_MAX } from "@/lib/bio-sabit";
 import { createClient } from "@/lib/supabase/server";
 import { syncOtherDevices } from "@/lib/sync";
 import type { FormState } from "@/lib/types";
@@ -99,6 +100,34 @@ export async function setAllowMessages(allow: boolean) {
     .eq("id", viewer.id);
   await syncOtherDevices(viewer.id);
   revalidatePath("/", "layout");
+}
+
+export async function updateBio(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const viewer = await requireViewer();
+  const bio = String(formData.get("bio") ?? "").trim();
+  if (bio.length > BIO_MAX) {
+    return { error: `bio en fazla ${BIO_MAX} karakter olabilir.` };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ bio: bio || null })
+    .eq("id", viewer.id);
+
+  if (error) {
+    // 015 migration'ı çalıştırılmadan kolon yoktur.
+    if (error.code === "42703" || error.code === "PGRST204") {
+      return { error: "bio özelliği henüz etkin değil." };
+    }
+    return { error: "bio kaydedilemedi, tekrar dene." };
+  }
+
+  revalidatePath("/", "layout");
+  return { message: bio ? "bio kaydedildi." : "bio kaldırıldı." };
 }
 
 export async function blockUser(targetId: string) {

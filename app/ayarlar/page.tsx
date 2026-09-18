@@ -5,10 +5,12 @@ import type { ReactNode } from "react";
 import Avatar from "@/components/Avatar";
 import ConfirmButton from "@/components/ConfirmButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import { getBio } from "@/lib/bio";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
 import { removeAvatar, setAllowMessages, unblockUser } from "./actions";
 import AvatarForm from "./AvatarForm";
+import BioForm from "./BioForm";
 
 export const metadata: Metadata = { title: "ayarlar" };
 
@@ -22,13 +24,16 @@ export default async function SettingsPage() {
   if (!viewer) redirect("/giris");
 
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("blocks")
-    .select(
-      "blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)",
-    )
-    .eq("blocker_id", viewer.id)
-    .order("created_at", { ascending: false });
+  const [{ data }, bio] = await Promise.all([
+    supabase
+      .from("blocks")
+      .select(
+        "blocked_id, blocked:profiles!blocks_blocked_id_fkey(username, avatar_url)",
+      )
+      .eq("blocker_id", viewer.id)
+      .order("created_at", { ascending: false }),
+    getBio(viewer.id),
+  ]);
   const blocks = (data ?? []) as unknown as BlockRow[];
 
   return (
@@ -66,6 +71,13 @@ export default async function SettingsPage() {
           </div>
           <AvatarForm />
         </div>
+      </SettingsSection>
+
+      <SettingsSection title="bio">
+        <p className="mb-3 text-sm leading-relaxed text-muted">
+          profilinde adının altında görünür.
+        </p>
+        <BioForm mevcut={bio} />
       </SettingsSection>
 
       <SettingsSection title="güvenlik">
