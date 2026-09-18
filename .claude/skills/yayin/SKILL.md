@@ -18,6 +18,24 @@ description: Zihin Sözlük'te commit, push ve canlı doğrulama düzeni. Bir i�
 
 Derleme geçmeden push etme. Push'tan sonra Vercel otomatik yayınlar.
 
+**Push'ta takılma.** Oturum etkileşimsiz; Git Credential Manager giriş
+penceresi açarsa görünmez ve push zaman aşımına kadar donar. Bu yüzden
+`~/.claude/settings.json` içinde `GCM_INTERACTIVE=never` ve
+`GIT_TERMINAL_PROMPT=0` tanımlı: kimlik sorunu artık donma değil, anında
+hata olarak döner.
+
+- Push'u zaman sınırıyla çalıştır: `timeout 60 git push origin main` (Bash).
+- `Authentication failed` / `could not read Username` görürsen **tekrar
+  deneme**. Token'ın süresi dolmuştur; kullanıcıya "PC'de bir kez
+  `git push` yapıp tarayıcıdan GitHub'a giriş yap" de ve dur.
+- Push'tan sonra `git status -sb` ile `origin/main` ile eşit olduğunu
+  gör. Görmeden "pushlandı" deme.
+
+**Yeniden yayın için boş commit atma.** "Trigger Vercel redeploy" gibi boş
+commit'ler geçmişte atıldı ve işe yaramadı: derleme zaten sıradaydı,
+sadece 1-3 dakika sürüyordu. Yayın gecikiyorsa bekle ve ölç; hâlâ eskiyse
+kullanıcıya Vercel panelindeki derleme durumuna bakmasını söyle.
+
 ## Canlı doğrulama
 
 Ölçmeden "yayında" deme. Bakılacaklar:
@@ -46,6 +64,7 @@ Bekleyen bir şey yoksa **"yapman gereken bir şey yok"** de. Bu cümle
 kullanıcıyı gereksiz kontrolden kurtarır.
 
 Ayrıca söylenmesi gerekenler:
+
 - Veri kaybı riski varsa **önden**.
 - SQL çalıştırılmadan önce ne bozulur, ne bozulmaz.
 - Bilerek yapılan tercihler (ör. alıntıya spoiler içeriğini almamak).

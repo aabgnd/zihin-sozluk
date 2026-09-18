@@ -81,14 +81,21 @@ Bu gerçek bir hata değil. Önce `npm run build`, sonra `tsc`.
   `[System.IO.File]::WriteAllText` kullan.
 - Bash aracı da mevcut (Git Bash); heredoc gerekiyorsa onu kullan.
 
-### Prettier kancası
+### Biçimlendirme kancası
 
-`PostToolUse` kancası her yazımdan sonra dosyayı yeniden biçimlendirir. Bu
-yüzden:
+`~/.claude/settings.json` içindeki `PostToolUse` kancası her yazımdan sonra
+Prettier ve `eslint --fix` çalıştırır. Prettier projenin bağımlılığı değil,
+npx önbelleğinden gelir; kanca onu `--no-install` ile çağırır, önbellekte
+yoksa sessizce atlar (indirmeye çalışıp donmaz). Kanca 30 sn'de kesilir.
+Bu yüzden:
+
+- Her yazım ~15-20 sn sürer; bu donma değil, ESLint'in açılışı.
 - Yazdıktan hemen sonra alınan tanılama (diagnostics) **eski** olabilir;
   panikleme, `tsc` ile teyit et.
 - Bir `Edit`'in `old_string`'i tutmuyorsa dosya yeniden biçimlenmiş olabilir;
   önce oku.
+- `git status` bir dosyayı değişmiş gösterip `git diff` boş dönüyorsa fark
+  yalnızca satır sonudur (LF/CRLF); gerçek değişiklik değil.
 
 ### JSX'te yorum
 
@@ -120,16 +127,16 @@ supabase/migrations/   numaralı SQL dosyaları
 
 Gerçek tablolar — varsayma, bunlar:
 
-| Tablo | İçerik |
-|---|---|
-| `profiles` | kullanıcı (auth.users'a bağlı). e-posta burada **değil** |
-| `topics` / `entries` | başlık ve entry. entry'de `user_id`, `topic_id`, `content` |
-| `entry_votes` / `favorites` | oy ve favori |
-| `messages` | özel mesaj. `sender_deleted_at`/`receiver_deleted_at` ile tek taraflı silme |
-| `notifications` / `follows` / `blocks` | bildirim, takip, engel |
-| `reports` / `mod_log` | şikayet ve moderasyon kaydı (RLS ile kapalı) |
-| `user_badges` / `badge_config` | rozetler |
-| `topic_stats` | görünüm: `entry_count`, `today_count`, `last_entry_at` |
+| Tablo                                  | İçerik                                                                      |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| `profiles`                             | kullanıcı (auth.users'a bağlı). e-posta burada **değil**                    |
+| `topics` / `entries`                   | başlık ve entry. entry'de `user_id`, `topic_id`, `content`                  |
+| `entry_votes` / `favorites`            | oy ve favori                                                                |
+| `messages`                             | özel mesaj. `sender_deleted_at`/`receiver_deleted_at` ile tek taraflı silme |
+| `notifications` / `follows` / `blocks` | bildirim, takip, engel                                                      |
+| `reports` / `mod_log`                  | şikayet ve moderasyon kaydı (RLS ile kapalı)                                |
+| `user_badges` / `badge_config`         | rozetler                                                                    |
+| `topic_stats`                          | görünüm: `entry_count`, `today_count`, `last_entry_at`                      |
 
 `users`, `likes`, `private_messages`, `audit_logs` diye tablolar **yoktur**.
 Entry'de onay (`approved`) akışı da yoktur; yazarlık çaylak sistemiyle
