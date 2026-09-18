@@ -36,6 +36,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-dvh flex-col bg-page font-sans text-ink">
+        {/* Klavyeyle gezen kullanıcı header ve kenar çubuğunu atlayabilsin.
+            Görünmez; yalnızca Tab ile odaklanınca çıkar. */}
+        <a
+          href="#icerik"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-gold"
+        >
+          içeriğe atla
+        </a>
         <SiteHeader />
 
         <div className="mx-auto grid w-full max-w-[1200px] flex-1 gap-8 px-4 py-6 md:grid-cols-[minmax(0,1fr)_280px] lg:grid-cols-[250px_minmax(0,1fr)_280px]">
@@ -45,7 +53,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
           </aside>
 
-          <main className="min-w-0">{children}</main>
+          <main id="icerik" tabIndex={-1} className="min-w-0 outline-none">
+            {children}
+          </main>
 
           <aside className="hidden md:block">
             <div className="sticky top-6">
