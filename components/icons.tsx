@@ -215,6 +215,22 @@ export function TrashIcon({ className }: IconProps) {
   );
 }
 
+/*
+ * İki kuleli kale: Stoacılığın "iç kale"si (Marcus Aurelius 8.48).
+ * Kapı evenodd ile oyulur. Dişler ve aralıkları 2 birim; 18px'te ~1,5px
+ * kalır ve seçilir. Daha ince detay küçük boyutta çamura döner.
+ */
+export function CastleIcon({ className }: IconProps) {
+  return (
+    <svg {...solid} className={className}>
+      <path
+        fillRule="evenodd"
+        d="M2 21V4H4V6H6V4H8V12H9V10H11V12H13V10H15V12H16V4H18V6H20V4H22V21Z M10 21V17A2 2 0 0 1 14 17V21Z"
+      />
+    </svg>
+  );
+}
+
 export function MenuIcon({ className }: IconProps) {
   return (
     <svg {...stroke} className={className}>

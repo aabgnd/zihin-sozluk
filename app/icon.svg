@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Sarı zemin + koyu kale: açık ve koyu sekme çubuğunda da seçilsin.
+       Şeffaf zemin üzerinde sarı kale açık çubukta 1,61:1 ile kaybolurdu. -->
+  <rect width="32" height="32" rx="7" fill="#f0c84a"/>
+  <path transform="translate(4 3.5)" fill="#1a1a1a" fill-rule="evenodd"
+    d="M2 21V4H4V6H6V4H8V12H9V10H11V12H13V10H15V12H16V4H18V6H20V4H22V21Z M10 21V17A2 2 0 0 1 14 17V21Z"/>
+</svg>
