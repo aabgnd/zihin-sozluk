@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
 import AccountNav from "./AccountNav";
-import { CastleIcon } from "./icons";
 import InfoModal from "./InfoModal";
 import LiveRefresh from "./LiveRefresh";
 import MobileAgendaDrawer from "./MobileAgendaDrawer";
@@ -73,16 +72,10 @@ export default async function SiteHeader() {
           <Link
             href={viewer ? "/?liste=bugun" : "/"}
             aria-label="zihin sözlük ana sayfa"
-            className="inline-flex shrink-0 items-center gap-[0.2em] whitespace-nowrap text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
+            className="shrink-0 whitespace-nowrap text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
           >
-            {/* Kale yazıyla birlikte ölçeklenir (em). 360px'de header'ı
-                taşırıyordu (ölçüldü); o yüzden 390px ve üstünde. İki kelime
-                tek span'de: flex aralığı bitişik logoyu bozmasın. */}
-            <CastleIcon className="hidden size-[1.05em] shrink-0 text-logo min-[390px]:block" />
-            <span>
-              <span className="text-logo">zihin</span>
-              <span className="ml-[0.1em] text-ink">sözlük</span>
-            </span>
+            <span className="text-logo">zihin</span>
+            <span className="ml-[0.1em] text-ink">sözlük</span>
           </Link>
 
           <SearchForm
