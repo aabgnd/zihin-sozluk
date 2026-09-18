@@ -92,9 +92,12 @@ yüzden:
 
 ### JSX'te yorum
 
-Bir elemanın **öznitelik listesinin içine** `//` yorumu yazma, parse hatası
-verir. `return (` ile eleman arasına da `{/* */}` koyma — o da ikinci çocuk
-sayılır. Yorumu `return`'ün üstüne al.
+`return (` ile eleman arasına `{/* */}` koyma: ikinci bir çocuk sayılır ve
+`TS2657: JSX expressions must have one parent element` verir. Yorumu
+`return`'ün üstüne al.
+
+Öznitelik listesinin içindeki `//` yorumu ise **geçerlidir** (tsc ile
+doğrulandı). Bu dosyanın eski bir sürümü aksini söylüyordu; yanlıştı.
 
 ## Supabase kalıpları
 

@@ -78,6 +78,14 @@ zayıftır, dolgu olarak kullanmak güçlüdür.** Aktif başlık şeridi bu yü
 sarı zemin + koyu yazı olarak yapıldı — hem istenen görünümü verdi hem
 kontrastı 1,61'den 10,8'e çıkardı.
 
+**Küçük sarı yazı kullanma.** Kullanıcı adı, rozet yazısı, entry numarası,
+satır içi bağlantı: yazı koyu (`text-ink`), sarı çerçeve, dolgu ya da alt
+çizgi (`decoration-gold`) olarak gelir. Rütbe rozetleri bir dönem soluk sarı
+zemin üzerinde sarı yazıyla ~1,4:1'e düşmüştü; kullanıcı "çirkin" dedi.
+
+İstisna: kalın, büyük manşet başlıklar (başlık sayfasının h1'i, entry
+kartındaki başlık adı) sarı kalabilir; kullanıcı bunu bilerek istedi.
+
 Kontrast eşiği geçmiyorsa geçmiyor de. Kullanıcı rengi bilerek seçtiyse
 uygula, ama sayıyı söyle ve seçenek sun.
 
