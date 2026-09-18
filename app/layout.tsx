@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import RightRail from "@/components/RightRail";
 import ScrollTopButton from "@/components/ScrollTopButton";
 import SiteFooter from "@/components/SiteFooter";
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <SiteFooter />
         <ScrollTopButton />
+        <Analytics />
       </body>
     </html>
   );
