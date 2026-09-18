@@ -26,7 +26,9 @@ export default function TopicList({
               {/* Bugünkü sayı yalnızca toplamdan farkliysa yazılır, aynı sayı iki kez görünmesin. */}
               {(topic.today_count ?? 0) > 0 &&
                 topic.today_count !== topic.entry_count && (
-                  <span className="font-semibold text-gold-ink">
+                  // Küçük sarı yazı okunmuyordu; sarı çip + koyu yazı. Satır
+                  // aktifken (sarı şerit) çip ters döner, yoksa kaybolurdu.
+                  <span className="rounded bg-gold px-1 font-semibold text-on-gold group-aria-[current=page]:bg-on-gold group-aria-[current=page]:text-gold">
                     +{topic.today_count}
                   </span>
                 )}

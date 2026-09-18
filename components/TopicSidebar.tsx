@@ -65,7 +65,7 @@ function TopRatedList({ entries }: { entries: TopEntry[] }) {
           >
             <span className="flex items-baseline justify-between gap-3">
               <span className="break-words text-sm">{entry.topic_title}</span>
-              <span className="shrink-0 text-xs text-gold-ink">
+              <span className="shrink-0 rounded bg-gold px-1 text-xs font-semibold text-on-gold">
                 +{entry.upvotes}
               </span>
             </span>
