@@ -1,9 +1,27 @@
 ---
 name: guvenlik
-description: Zihin Sözlük'te veritabanı değişikliği, yetki, moderasyon ve oturum işleri. SQL migration yazmadan, RLS ya da grant dokunmadan, moderasyon fonksiyonu eklemeden, rol/ban/susturma mantığı değiştirmeden ve kimlik doğrulayan herhangi bir uç yazmadan önce bu skill'i kullan. "Şunu silebilsin", "yetki ver", "sadece admin yapabilsin", "migration yaz" gibi isteklerde mutlaka oku. Buradaki kurallar veri kaybını ve yetki açıklarını önlemek için var.
+description: Zihin Sözlük'te veritabanı değişikliği, yetki, moderasyon, oturum ve mail akışı işleri. SQL migration yazmadan, RLS ya da grant dokunmadan, moderasyon fonksiyonu eklemeden, rol/ban/susturma mantığı değiştirmeden, kimlik doğrulayan bir uç yazmadan ve kayıt, giriş, e-posta onayı, şifre sıfırlama ya da çerezle ilgili herhangi bir işten önce bu skill'i kullan. "Şunu silebilsin", "yetki ver", "sadece admin yapabilsin", "migration yaz", "mail gelmiyor", "giriş yapamıyorum" gibi isteklerde mutlaka oku.
 ---
 
 # Zihin Sözlük: güvenlik
+
+## ⛔ Mail ve oturum akışı
+
+Kullanıcının hassas çizgisi. Haftalarca uğraşılarak çalışır hâle getirildi.
+Kullanıcıya sormadan değiştirme:
+
+- Çerezler **`sameSite=lax`** kalır. `Strict`, Gmail'den açılan onay ve
+  yenileme linklerinde çerezi göndermez; kullanıcı tıklar ama giriş yapmamış
+  görünür. Bu hata yaşandı ve çözüldü.
+- `lib/auth-confirm.ts`: `yonlendir()` çerezleri yanıta elle yazar,
+  `oku()` mail şablonundaki `&amp;` kaçışını tolere eder. İkisi de şart.
+- Dönüş adresi `lib/site-url.ts`'ten gelir; sabit adres yazma.
+- Şifre sıfırlama, e-posta kayıtlı olsun olmasın aynı cevabı verir.
+- Kendi mail gönderimi kurma; mailler Supabase + Resend SMTP ile gidiyor.
+
+Bu akışa dokunulacaksa önce kullanıcıya söyle, sonra canlıda ölç: Supabase
+`/auth/v1/verify` ucuna sahte token ve `redirect_to` ile istek atıp
+`Location` başlığına bak. Gerçek kullanıcı adıyla test yapma.
 
 ## Migration kuralları
 
