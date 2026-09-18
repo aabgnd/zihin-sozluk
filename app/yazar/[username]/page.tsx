@@ -149,7 +149,11 @@ export default async function AuthorPage({
           size="lg"
         />
         <div className="min-w-0 space-y-1.5">
-          <h1 className="break-words text-2xl font-bold">{profile.username}</h1>
+          {/* Profil sahibinin adı sayfanın manşeti: başlık sayfasındaki h1
+              gibi sarı. Kalın ve büyük olduğu için sarı burada okunuyor. */}
+          <h1 className="break-words text-2xl font-bold text-logo">
+            {profile.username}
+          </h1>
           <div className="flex flex-wrap items-center gap-1.5">
             <RankBadge entryCount={entryCount} size="md" />
             <TitleBadge generation={profile.generation} title={profile.title} />
@@ -378,25 +382,9 @@ export default async function AuthorPage({
         : ((rows ?? []) as unknown as EntryRow[])
     ) as EntryRow[];
 
-    const authorIds = [
-      ...new Set(
-        entries.flatMap((entry) => (entry.author ? [entry.author.id] : [])),
-      ),
-    ];
-
-    const [{ votes, favorites }, countResult] = await Promise.all([
-      getViewerEntryState(
-        viewer?.id ?? null,
-        entries.map((entry) => entry.id),
-      ),
-      authorIds.length > 0
-        ? supabase.rpc("user_entry_counts", { ids: authorIds })
-        : Promise.resolve({ data: [] }),
-    ]);
-    const authorCounts = new Map(
-      (
-        (countResult.data ?? []) as { user_id: string; entry_count: number }[]
-      ).map((row) => [row.user_id, row.entry_count]),
+    const { votes, favorites } = await getViewerEntryState(
+      viewer?.id ?? null,
+      entries.map((entry) => entry.id),
     );
 
     if (entries.length === 0) {
@@ -419,9 +407,6 @@ export default async function AuthorPage({
             isStaff={viewer?.isStaff ?? false}
             myVote={votes.get(entry.id)}
             favorited={favorites.has(entry.id)}
-            authorEntryCount={
-              entry.author ? (authorCounts.get(entry.author.id) ?? null) : null
-            }
             showTopic
           />
         ))}

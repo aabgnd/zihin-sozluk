@@ -15,7 +15,6 @@ import {
   HeartIcon,
   ShareIcon,
 } from "./icons";
-import RankBadge from "./RankBadge";
 import ReportButton from "./ReportButton";
 
 type Props = {
@@ -25,11 +24,20 @@ type Props = {
   myVote?: number;
   favorited?: boolean;
   showTopic?: boolean;
-  authorEntryCount?: number | null;
 };
 
-const groupButton =
-  "inline-flex h-9 items-center gap-1 px-2.5 text-sm text-muted hover:bg-surface-2 hover:text-ink";
+const groupButton = "inline-flex h-9 items-center gap-1 px-2.5 text-sm";
+
+/*
+ * Oy ve favori düğmesinin iki hâli ayrı sınıf gruplarında: aynı dizide
+ * durursa hangisinin kazanacağı CSS sırasına kalır ve aktif dolgu hover'da
+ * kaybolabilirdi.
+ *
+ * Aktif hâl sarı DOLGU, simge koyu. Önceden simge soluk sarıya dönüyordu;
+ * açık temada oy verip vermediğin neredeyse görünmüyordu.
+ */
+const pasifDugme = "text-muted hover:bg-surface-2 hover:text-ink";
+const aktifDugme = "bg-gold/35 text-ink hover:bg-gold/45";
 const entryMenuItem =
   "flex h-11 w-full items-center px-4 text-left text-sm hover:bg-surface-2";
 
@@ -40,7 +48,6 @@ export default function EntryCard({
   myVote = 0,
   favorited = false,
   showTopic = false,
-  authorEntryCount = null,
 }: Props) {
   const favoriteCount = entry.favorites[0]?.count ?? 0;
   const { author } = entry;
@@ -92,7 +99,7 @@ export default function EntryCard({
               type="submit"
               aria-label="artı oy"
               aria-pressed={myVote === 1}
-              className={`${groupButton} ${myVote === 1 ? "text-gold-ink" : ""}`}
+              className={`${groupButton} ${myVote === 1 ? aktifDugme : pasifDugme}`}
             >
               <ChevronUpIcon className="size-4" />
               {entry.upvotes}
@@ -103,7 +110,7 @@ export default function EntryCard({
               type="submit"
               aria-label="eksi oy"
               aria-pressed={myVote === -1}
-              className={`${groupButton} ${myVote === -1 ? "text-gold-ink" : ""}`}
+              className={`${groupButton} ${myVote === -1 ? aktifDugme : pasifDugme}`}
             >
               <ChevronDownIcon className="size-4" />
             </button>
@@ -113,7 +120,7 @@ export default function EntryCard({
               type="submit"
               aria-label={favorited ? "favorilerden çıkar" : "favorile"}
               aria-pressed={favorited}
-              className={`${groupButton} ${favorited ? "text-gold-ink" : ""}`}
+              className={`${groupButton} ${favorited ? aktifDugme : pasifDugme}`}
             >
               <HeartIcon filled={favorited} className="size-4" />
               {favoriteCount > 0 && favoriteCount}
@@ -189,20 +196,15 @@ export default function EntryCard({
       */}
       <div className="mt-3 flex items-center justify-end gap-2.5">
         <div className="min-w-0 text-right">
+          {/* Rütbe burada gösterilmez, yalnızca profilde: entry'nin altı
+              sade kalsın, göz yazıda dursun. */}
           {author ? (
-            <div className="flex flex-wrap items-center justify-end gap-1.5">
-              <Link
-                href={`/yazar/${encodeURIComponent(author.username)}`}
-                // İsim koyu; sarı yalnızca üzerine gelince alt çizgide.
-                // Sarı yazı rütbe rozetinin yanında soluk ve okunaksızdı.
-                className="text-sm font-semibold text-ink decoration-gold decoration-2 underline-offset-4 hover:underline"
-              >
-                {author.username}
-              </Link>
-              {authorEntryCount !== null && (
-                <RankBadge entryCount={authorEntryCount} />
-              )}
-            </div>
+            <Link
+              href={`/yazar/${encodeURIComponent(author.username)}`}
+              className="text-sm font-semibold text-ink decoration-gold decoration-2 underline-offset-4 hover:underline"
+            >
+              {author.username}
+            </Link>
           ) : (
             <span className="text-sm text-muted">silinmiş hesap</span>
           )}

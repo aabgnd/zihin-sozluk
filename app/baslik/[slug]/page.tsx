@@ -76,26 +76,10 @@ export default async function TopicPage({
       : await listQuery.order("created_at", { ascending: sort !== "yeni" });
 
   const entries = (data ?? []) as unknown as EntryRow[];
-  const authorIds = [
-    ...new Set(
-      entries.flatMap((entry) => (entry.author ? [entry.author.id] : [])),
-    ),
-  ];
 
-  const [{ votes, favorites }, countResult] = await Promise.all([
-    getViewerEntryState(
-      viewer?.id ?? null,
-      entries.map((entry) => entry.id),
-    ),
-    authorIds.length > 0
-      ? supabase.rpc("user_entry_counts", { ids: authorIds })
-      : Promise.resolve({ data: [] }),
-  ]);
-
-  const authorCounts = new Map(
-    (
-      (countResult.data ?? []) as { user_id: string; entry_count: number }[]
-    ).map((row) => [row.user_id, row.entry_count]),
+  const { votes, favorites } = await getViewerEntryState(
+    viewer?.id ?? null,
+    entries.map((entry) => entry.id),
   );
 
   const basePath = `/baslik/${topic.slug}`;
@@ -159,9 +143,6 @@ export default async function TopicPage({
             isStaff={viewer?.isStaff ?? false}
             myVote={votes.get(entry.id)}
             favorited={favorites.has(entry.id)}
-            authorEntryCount={
-              entry.author ? (authorCounts.get(entry.author.id) ?? null) : null
-            }
           />
         ),
       )}

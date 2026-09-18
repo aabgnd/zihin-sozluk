@@ -7,17 +7,18 @@ export const RUTBELER = ["çırak", "kalfa", "usta", "sanatçı"] as const;
 export type Rutbe = (typeof RUTBELER)[number];
 
 /*
- * Seviye yükseldikçe rozet belirginleşir: gri çerçeve → sarı çerçeve →
- * yumuşak sarı dolgu → dolu sarı.
+ * Rütbe yalnızca profilde gösterilir (entry'nin altında değil), bu yüzden
+ * her seviyede sarı taşır ve seviye yükseldikçe dolgu koyulaşır:
+ * sarı çerçeve → yumuşak dolgu → güçlü dolgu → dolu sarı.
  *
- * Yazı her seviyede KOYU. Sarı yalnızca çerçeve ve dolgu olarak kullanılır;
- * sarı yazı beyaz zeminde 1,61:1 ile okunmuyor, soluk sarı zemin üzerinde
- * sarı yazı ise neredeyse hiç okunmuyordu (kalfa ve usta bu yüzden bozuktu).
+ * Yazı her seviyede KOYU. Sarı yazı beyaz zeminde 1,61:1 ile okunmuyor;
+ * soluk sarı zemin üzerinde sarı yazı ise neredeyse hiç okunmuyordu. Sarı
+ * burada yalnızca çerçeve ve dolgu olarak kullanılır.
  */
 export const RUTBE_STILLERI: Record<Rutbe, string> = {
-  çırak: "border-line text-muted",
-  kalfa: "border-gold text-ink",
-  usta: "border-gold bg-gold/25 text-ink",
+  çırak: "border-gold text-ink",
+  kalfa: "border-gold bg-gold/35 text-ink",
+  usta: "border-gold bg-gold/65 text-on-gold",
   sanatçı: "border-gold bg-gold text-on-gold",
 };
 

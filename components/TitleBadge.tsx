@@ -9,10 +9,10 @@ export default function TitleBadge({
   if (!generation || !title) return null;
 
   return (
-    // Rütbe rozetlerinden ayrışsın diye yuvarlak ve başında sarı nokta var.
-    // Yazı koyu; sarı yazı beyaz zeminde okunmuyordu.
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/70 px-2.5 py-px text-[13px] font-semibold lowercase text-ink">
-      <span aria-hidden="true" className="size-1.5 rounded-full bg-gold" />
+    // Dolu sarı ve yuvarlak: köşeli rütbe rozetinden şekliyle ayrışır.
+    // Yazı koyu, çünkü sarı zemin üzerinde koyu yazı 10,8:1 ile okunuyor.
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-2.5 py-px text-[13px] font-semibold lowercase text-on-gold">
+      <span aria-hidden="true" className="size-1.5 rounded-full bg-on-gold/55" />
       {`${generation} – ${title}`.toLocaleLowerCase("tr")}
     </span>
   );
