@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/viewer";
 import AccountNav from "./AccountNav";
-import CevizLogo from "./CevizLogo";
 import InfoModal from "./InfoModal";
 import LiveRefresh from "./LiveRefresh";
 import MobileAgendaDrawer from "./MobileAgendaDrawer";
@@ -73,12 +72,10 @@ export default async function SiteHeader() {
           <Link
             href={viewer ? "/?liste=bugun" : "/"}
             aria-label="zihin sözlük ana sayfa"
-            className="group inline-flex shrink-0 items-center whitespace-nowrap text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
+            className="shrink-0 whitespace-nowrap text-base font-extrabold lowercase tracking-tight sm:text-xl md:text-2xl"
           >
             <span className="text-logo">zihin</span>
             <span className="ml-[0.1em] text-ink">sözlük</span>
-            {/* 360px'de header dolu; ceviz sığmıyor, düğmeler kalsın diye gizli. */}
-            <CevizLogo className="ml-[0.2em] size-[1.1em] max-[379px]:hidden text-ink transition-transform duration-200 group-hover:-rotate-12 motion-reduce:transition-none" />
           </Link>
 
           <SearchForm
